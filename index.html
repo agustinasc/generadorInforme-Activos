@@ -4,6 +4,164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Generador de Informes – AGAP</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f0f2f5; color: #222; }
+
+header {
+  background: #1a3a5c; color: white;
+  padding: 14px 28px; display: flex; align-items: center; gap: 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+header h1 { font-size: 17px; font-weight: 600; letter-spacing: 0.4px; }
+header span { font-size: 12px; opacity: 0.7; }
+
+/* PESTAÑAS */
+.tabs-bar {
+  background: #14304e;
+  display: flex; gap: 0; padding: 0 28px;
+  border-bottom: 3px solid #0f2540;
+}
+.tab-btn {
+  padding: 11px 22px; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.6); background: none; border: none;
+  cursor: pointer; border-bottom: 3px solid transparent;
+  margin-bottom: -3px; transition: all 0.15s; letter-spacing: 0.3px;
+}
+.tab-btn:hover { color: rgba(255,255,255,0.9); }
+.tab-btn.active { color: white; border-bottom-color: #4fc3f7; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.container { max-width: 980px; margin: 24px auto; padding: 0 16px 60px; }
+
+.card {
+  background: white; border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 18px; overflow: hidden;
+}
+.card-header {
+  background: #1a3a5c; color: white; padding: 9px 18px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
+}
+.card-body { padding: 18px; }
+
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
+.form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+.span2 { grid-column: span 2; }
+.span3 { grid-column: span 3; }
+
+.field label {
+  display: block; font-size: 11px; font-weight: 600; color: #555;
+  text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px;
+}
+.field input, .field select, .field textarea {
+  width: 100%; padding: 7px 10px; border: 1px solid #ccc;
+  border-radius: 5px; font-size: 13px; color: #222; transition: border-color 0.2s;
+  font-family: Arial, sans-serif;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none; border-color: #1a3a5c; box-shadow: 0 0 0 2px rgba(26,58,92,0.12);
+}
+
+.radio-group { display: flex; gap: 18px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
+.radio-group label {
+  font-size: 13px; font-weight: normal; text-transform: none; letter-spacing: 0;
+  display: flex; align-items: center; gap: 6px; cursor: pointer; color: #333;
+}
+.radio-group input[type=radio] { width: auto; }
+
+/* Tabla A */
+.tabla-a { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
+.tabla-a th { background: #1a3a5c; color: white; padding: 7px 11px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+.tabla-a th.left { text-align: left; }
+.tabla-a td { padding: 5px 11px; border-bottom: 1px solid #eee; font-size: 13px; }
+.tabla-a td input { border: 1px solid #ddd; border-radius: 4px; padding: 4px 7px; font-size: 13px; width: 90px; text-align: center; }
+.tabla-a td input:focus { outline: none; border-color: #1a3a5c; }
+.tabla-a tr.total-row td { font-weight: 700; background: #f5f7fa; }
+.total-val { color: #1a3a5c; font-size: 14px; font-weight: 700; }
+
+/* Sección B dos bloques */
+.secb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+.secb-bloque { border-radius: 7px; border: 1px solid #e0e4ea; overflow: hidden; }
+.secb-bloque-header { padding: 8px 13px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: white; }
+.secb-bloque-header.certif { background: #1565c0; }
+.secb-bloque-header.bdd    { background: #2e7d32; }
+.secb-bloque-body { padding: 11px 13px; }
+
+.intervalos-wrapper { display: flex; flex-direction: column; gap: 7px; margin-bottom: 7px; }
+.intervalo-row {
+  display: grid; grid-template-columns: 1fr 1fr auto;
+  gap: 7px; align-items: end; background: #f9fafb;
+  border: 1px solid #e0e4ea; border-radius: 6px; padding: 9px 11px;
+}
+.intervalo-row.certif       { border-left: 3px solid #1565c0; }
+.intervalo-row.bdd          { border-left: 3px solid #2e7d32; }
+.intervalo-row.excluido-certif { border-left: 3px solid #c0392b; }
+.intervalo-row.excluido-bdd    { border-left: 3px solid #e67e22; }
+
+.mini-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #666; margin-bottom: 3px; display: block; }
+.intervalo-row input[type=date] { width: 100%; padding: 6px 7px; border: 1px solid #ccc; border-radius: 5px; font-size: 12px; }
+.intervalo-row input[type=date]:focus { outline: none; border-color: #1a3a5c; }
+
+.btn-remove { background: none; border: 1px solid #ddd; border-radius: 5px; color: #999; cursor: pointer; padding: 4px 8px; font-size: 13px; transition: all 0.15s; align-self: flex-end; }
+.btn-remove:hover { background: #fee; border-color: #e74c3c; color: #e74c3c; }
+
+.btn-add { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 5px; border: none; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 2px; }
+.btn-add.certif     { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.btn-add.certif:hover { background: #bbdefb; }
+.btn-add.bdd        { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.btn-add.bdd:hover  { background: #c8e6c9; }
+.btn-add.excl-certif { background: #fdecea; color: #c0392b; border: 1px solid #ef9a9a; }
+.btn-add.excl-certif:hover { background: #ffcdd2; }
+.btn-add.excl-bdd   { background: #fff3e0; color: #e67e22; border: 1px solid #ffcc80; }
+.btn-add.excl-bdd:hover { background: #ffe0b2; }
+
+.secb-resultado { background: #f5f7fa; border: 1px solid #d0d8e4; border-radius: 6px; padding: 9px 13px; margin-top: 9px; }
+.secb-resultado .res-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #666; }
+.secb-resultado .res-valor { font-size: 16px; font-weight: 700; margin-top: 2px; }
+.secb-resultado .res-valor.certif { color: #1565c0; }
+.secb-resultado .res-valor.bdd    { color: #2e7d32; }
+.secb-resultado .res-detalle { font-size: 11px; color: #888; margin-top: 2px; }
+
+/* Alerta */
+.alerta-diferencia { display: none; border-radius: 8px; padding: 14px 18px; margin-top: 14px; border: 2px solid; }
+.alerta-diferencia.danger { display: flex; align-items: flex-start; gap: 13px; background: #fff3f3; border-color: #e74c3c; color: #c0392b; }
+.alerta-diferencia.ok     { display: flex; align-items: flex-start; gap: 13px; background: #f0faf2; border-color: #2e7d32; color: #2e7d32; }
+.alerta-diferencia .alerta-icon  { font-size: 24px; flex-shrink: 0; }
+.alerta-diferencia .alerta-titulo  { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.alerta-diferencia .alerta-detalle { font-size: 13px; opacity: 0.85; }
+
+/* Ponderación */
+.pond-tabla { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
+.pond-tabla th { background: #1a3a5c; color: white; padding: 7px 11px; text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+.pond-tabla td { padding: 7px 11px; border-bottom: 1px solid #eee; text-align: center; }
+.pond-tabla td.left { text-align: left; font-weight: 600; }
+.pond-tabla input[type=text] { width: 120px; border: 1px solid #ddd; border-radius: 4px; padding: 4px 7px; font-size: 13px; text-align: right; }
+.pond-tabla input:focus { outline: none; border-color: #1a3a5c; }
+.pond-tabla tr.total-row td { font-weight: 700; background: #f5f7fa; }
+.pond-tabla tr.result-row td { font-weight: 700; background: #eef3f8; color: #1a3a5c; font-size: 13px; }
+.calc-val { color: #555; font-style: italic; }
+
+/* Botón generar */
+.btn-generar { width: 100%; padding: 13px; background: #1a3a5c; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 6px; }
+.btn-generar:hover { background: #14304e; }
+.btn-generar:active { background: #0f2540; }
+
+.section-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.excl-sep { font-size: 10px; color: #aaa; align-self: center; }
+
+.toast { position: fixed; bottom: 24px; right: 24px; background: #2e7d32; color: white; padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 999; }
+.toast.show { opacity: 1; }
+
+.divider { border: none; border-top: 1px solid #e8ecf0; margin: 14px 0; }
+
+@media (max-width: 700px) {
+  .form-grid, .form-grid.three { grid-template-columns: 1fr; }
+  .span2, .span3 { grid-column: span 1; }
+  .secb-grid { grid-template-columns: 1fr; }
+}
+</style>
 <script>(function(global2, factory) {
   typeof exports === "object" && typeof module !== "undefined" ? factory(exports) : typeof define === "function" && define.amd ? define(["exports"], factory) : (global2 = typeof globalThis !== "undefined" ? globalThis : global2 || self, factory(global2.docx = {}));
 })(this, function(exports2) {
@@ -20124,415 +20282,461 @@ var __async = (__this, __arguments, generator) => {
 <script>(function(a,b){if("function"==typeof define&&define.amd)define([],b);else if("undefined"!=typeof exports)b();else{b(),a.FileSaver={exports:{}}.exports}})(this,function(){"use strict";function b(a,b){return"undefined"==typeof b?b={autoBom:!1}:"object"!=typeof b&&(console.warn("Deprecated: Expected third argument to be a object"),b={autoBom:!b}),b.autoBom&&/^\s*(?:text\/\S*|application\/xml|\S*\/\S*\+xml)\s*;.*charset\s*=\s*utf-8/i.test(a.type)?new Blob(["\uFEFF",a],{type:a.type}):a}function c(a,b,c){var d=new XMLHttpRequest;d.open("GET",a),d.responseType="blob",d.onload=function(){g(d.response,b,c)},d.onerror=function(){console.error("could not download file")},d.send()}function d(a){var b=new XMLHttpRequest;b.open("HEAD",a,!1);try{b.send()}catch(a){}return 200<=b.status&&299>=b.status}function e(a){try{a.dispatchEvent(new MouseEvent("click"))}catch(c){var b=document.createEvent("MouseEvents");b.initMouseEvent("click",!0,!0,window,0,0,0,80,20,!1,!1,!1,!1,0,null),a.dispatchEvent(b)}}var f="object"==typeof window&&window.window===window?window:"object"==typeof self&&self.self===self?self:"object"==typeof global&&global.global===global?global:void 0,a=f.navigator&&/Macintosh/.test(navigator.userAgent)&&/AppleWebKit/.test(navigator.userAgent)&&!/Safari/.test(navigator.userAgent),g=f.saveAs||("object"!=typeof window||window!==f?function(){}:"download"in HTMLAnchorElement.prototype&&!a?function(b,g,h){var i=f.URL||f.webkitURL,j=document.createElement("a");g=g||b.name||"download",j.download=g,j.rel="noopener","string"==typeof b?(j.href=b,j.origin===location.origin?e(j):d(j.href)?c(b,g,h):e(j,j.target="_blank")):(j.href=i.createObjectURL(b),setTimeout(function(){i.revokeObjectURL(j.href)},4E4),setTimeout(function(){e(j)},0))}:"msSaveOrOpenBlob"in navigator?function(f,g,h){if(g=g||f.name||"download","string"!=typeof f)navigator.msSaveOrOpenBlob(b(f,h),g);else if(d(f))c(f,g,h);else{var i=document.createElement("a");i.href=f,i.target="_blank",setTimeout(function(){e(i)})}}:function(b,d,e,g){if(g=g||open("","_blank"),g&&(g.document.title=g.document.body.innerText="downloading..."),"string"==typeof b)return c(b,d,e);var h="application/octet-stream"===b.type,i=/constructor/i.test(f.HTMLElement)||f.safari,j=/CriOS\/[\d]+/.test(navigator.userAgent);if((j||h&&i||a)&&"undefined"!=typeof FileReader){var k=new FileReader;k.onloadend=function(){var a=k.result;a=j?a:a.replace(/^data:[^;]*;/,"data:attachment/file;"),g?g.location.href=a:location=a,g=null},k.readAsDataURL(b)}else{var l=f.URL||f.webkitURL,m=l.createObjectURL(b);g?g.location=m:location.href=m,g=null,setTimeout(function(){l.revokeObjectURL(m)},4E4)}});f.saveAs=g.saveAs=g,"undefined"!=typeof module&&(module.exports=g)});
 
 //# sourceMappingURL=FileSaver.min.js.map</script>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #f0f2f5; color: #222; }
-
-  header {
-    background: #1a3a5c; color: white;
-    padding: 16px 32px; display: flex; align-items: center; gap: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  }
-  header h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.5px; }
-  header span { font-size: 13px; opacity: 0.7; }
-
-  .container { max-width: 960px; margin: 28px auto; padding: 0 16px 60px; }
-
-  .card {
-    background: white; border-radius: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden;
-  }
-  .card-header {
-    background: #1a3a5c; color: white; padding: 10px 20px;
-    font-size: 13px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase;
-  }
-  .card-body { padding: 20px; }
-
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .span2 { grid-column: span 2; }
-
-  .field label {
-    display: block; font-size: 11px; font-weight: 600; color: #555;
-    text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px;
-  }
-  .field input, .field select {
-    width: 100%; padding: 8px 10px; border: 1px solid #ccc;
-    border-radius: 5px; font-size: 13px; color: #222; transition: border-color 0.2s;
-  }
-  .field input:focus, .field select:focus {
-    outline: none; border-color: #1a3a5c; box-shadow: 0 0 0 2px rgba(26,58,92,0.12);
-  }
-
-  .radio-group { display: flex; gap: 20px; align-items: center; margin-top: 4px; flex-wrap: wrap; }
-  .radio-group label {
-    font-size: 13px; font-weight: normal; text-transform: none; letter-spacing: 0;
-    display: flex; align-items: center; gap: 6px; cursor: pointer; color: #333;
-  }
-  .radio-group input[type=radio] { width: auto; }
-
-  /* Tabla sección A */
-  .tabla-a { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
-  .tabla-a th { background: #1a3a5c; color: white; padding: 8px 12px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
-  .tabla-a td { padding: 6px 12px; border-bottom: 1px solid #eee; }
-  .tabla-a td input { border: 1px solid #ddd; border-radius: 4px; padding: 5px 8px; font-size: 13px; width: 100px; text-align: center; }
-  .tabla-a td input:focus { outline: none; border-color: #1a3a5c; }
-  .tabla-a tr.total-row td { font-weight: 700; background: #f5f7fa; }
-  #total-periodos { color: #1a3a5c; font-size: 14px; }
-
-  /* Sección B - dos columnas */
-  .secb-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 16px;
-  }
-  .secb-bloque {
-    border-radius: 7px; border: 1px solid #e0e4ea; overflow: hidden;
-  }
-  .secb-bloque-header {
-    padding: 9px 14px; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.4px; color: white;
-  }
-  .secb-bloque-header.certif { background: #1565c0; }
-  .secb-bloque-header.bdd    { background: #2e7d32; }
-  .secb-bloque-body { padding: 12px 14px; }
-
-  .intervalos-wrapper { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
-  .intervalo-row {
-    display: grid; grid-template-columns: 1fr 1fr auto;
-    gap: 8px; align-items: end; background: #f9fafb;
-    border: 1px solid #e0e4ea; border-radius: 6px; padding: 10px 12px;
-  }
-  .intervalo-row.certif { border-left: 3px solid #1565c0; }
-  .intervalo-row.bdd    { border-left: 3px solid #2e7d32; }
-  .intervalo-row.excluido-certif { border-left: 3px solid #c0392b; }
-  .intervalo-row.excluido-bdd    { border-left: 3px solid #e67e22; }
-
-  .mini-label {
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.4px; color: #666; margin-bottom: 4px; display: block;
-  }
-  .intervalo-row input[type=date] {
-    width: 100%; padding: 6px 7px; border: 1px solid #ccc;
-    border-radius: 5px; font-size: 12px;
-  }
-  .intervalo-row input[type=date]:focus { outline: none; border-color: #1a3a5c; }
-
-  .btn-remove {
-    background: none; border: 1px solid #ddd; border-radius: 5px;
-    color: #999; cursor: pointer; padding: 5px 9px; font-size: 14px;
-    transition: all 0.15s; align-self: flex-end;
-  }
-  .btn-remove:hover { background: #fee; border-color: #e74c3c; color: #e74c3c; }
-
-  .btn-add {
-    display: inline-flex; align-items: center; gap: 5px;
-    padding: 6px 12px; border-radius: 5px; border: none;
-    font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; margin-top: 2px;
-  }
-  .btn-add.certif    { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-  .btn-add.certif:hover { background: #bbdefb; }
-  .btn-add.bdd       { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-  .btn-add.bdd:hover { background: #c8e6c9; }
-  .btn-add.excl-certif { background: #fdecea; color: #c0392b; border: 1px solid #ef9a9a; margin-left: 6px; }
-  .btn-add.excl-certif:hover { background: #ffcdd2; }
-  .btn-add.excl-bdd  { background: #fff3e0; color: #e67e22; border: 1px solid #ffcc80; margin-left: 6px; }
-  .btn-add.excl-bdd:hover { background: #ffe0b2; }
-
-  .secb-resultado {
-    background: #f5f7fa; border: 1px solid #d0d8e4; border-radius: 6px;
-    padding: 10px 14px; margin-top: 10px;
-  }
-  .secb-resultado .res-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #666; }
-  .secb-resultado .res-valor { font-size: 17px; font-weight: 700; margin-top: 2px; }
-  .secb-resultado .res-valor.certif { color: #1565c0; }
-  .secb-resultado .res-valor.bdd    { color: #2e7d32; }
-  .secb-resultado .res-detalle { font-size: 11px; color: #888; margin-top: 2px; }
-
-  /* Alerta diferencia */
-  .alerta-diferencia {
-    display: none; border-radius: 8px; padding: 16px 20px;
-    margin-top: 16px; border: 2px solid;
-  }
-  .alerta-diferencia.danger {
-    display: flex; align-items: flex-start; gap: 14px;
-    background: #fff3f3; border-color: #e74c3c; color: #c0392b;
-  }
-  .alerta-diferencia.ok {
-    display: flex; align-items: flex-start; gap: 14px;
-    background: #f0faf2; border-color: #2e7d32; color: #2e7d32;
-  }
-  .alerta-diferencia .alerta-icon { font-size: 26px; flex-shrink: 0; }
-  .alerta-diferencia .alerta-titulo { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .alerta-diferencia .alerta-detalle { font-size: 13px; opacity: 0.85; }
-
-  .btn-generar {
-    width: 100%; padding: 14px; background: #1a3a5c; color: white;
-    border: none; border-radius: 8px; font-size: 15px; font-weight: 700;
-    cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 8px;
-  }
-  .btn-generar:hover { background: #14304e; }
-  .btn-generar:active { background: #0f2540; }
-  .btn-generar:disabled { background: #aaa; cursor: not-allowed; }
-
-  .toast {
-    position: fixed; bottom: 28px; right: 28px; background: #2e7d32; color: white;
-    padding: 12px 22px; border-radius: 8px; font-size: 14px; font-weight: 600;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s;
-    pointer-events: none; z-index: 999;
-  }
-  .toast.show { opacity: 1; }
-
-  .section-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-  .excl-sep { font-size: 10px; color: #aaa; align-self: center; }
-
-  @media (max-width: 700px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .span2 { grid-column: span 1; }
-    .secb-grid { grid-template-columns: 1fr; }
-  }
-</style>
 </head>
 <body>
 
 <header>
   <div>
-    <h1>Generador de Informes de Cargo Administrativo</h1>
+    <h1>Generador de Informes</h1>
     <span>D.P.G.P.A. – AGAP · Gobierno de Catamarca</span>
   </div>
 </header>
 
+<!-- PESTAÑAS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" onclick="switchTab('administrativo')">📋 Administrativo</button>
+  <button class="tab-btn" onclick="switchTab('mixto')">📋 Mixto (Adm + Doc)</button>
+  <button class="tab-btn" onclick="switchTab('pension')">📋 Pensión</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PESTAÑA 1: ADMINISTRATIVO
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-administrativo" class="tab-content active">
 <div class="container">
 
-  <!-- DATOS DEL AGENTE -->
   <div class="card">
     <div class="card-header">Datos del Agente</div>
     <div class="card-body">
       <div class="form-grid">
-        <div class="field span2">
-          <label>Apellido y Nombres</label>
-          <input type="text" id="nombre" placeholder="Ej: Valdez, Ramón Del Valle">
-        </div>
-        <div class="field">
-          <label>DNI</label>
-          <input type="text" id="dni" placeholder="Ej: 10.349.642">
-        </div>
-        <div class="field">
-          <label>CUIL</label>
-          <input type="text" id="cuil" placeholder="Ej: 20-10349642-0">
-        </div>
-        <div class="field span2">
-          <label>Lugar de Trabajo</label>
-          <input type="text" id="lugar" placeholder="Ej: Municipalidad de Tapso">
-        </div>
-        <div class="field">
-          <label>Fecha de Adhesión (MM/AAAA)</label>
-          <input type="text" id="adhesion" placeholder="07/2014">
-        </div>
-        <div class="field">
-          <label>Período de Retención (MM/AAAA)</label>
-          <input type="text" id="retencion" placeholder="07/2014">
-        </div>
-        <div class="field span2">
-          <label>Situación de Revista</label>
-          <input type="text" id="revista" placeholder="Ej: Jubilación">
-        </div>
-        <div class="field">
-          <label>N° de Informe</label>
-          <input type="text" id="ninforme" placeholder="Ej: 681">
-        </div>
-        <div class="field">
-          <label>Fecha del Documento</label>
-          <input type="date" id="fecha-doc">
-        </div>
+        <div class="field span2"><label>Apellido y Nombres</label><input type="text" id="adm-nombre" placeholder="Ej: Valdez, Ramón Del Valle"></div>
+        <div class="field"><label>DNI</label><input type="text" id="adm-dni" placeholder="Ej: 10.349.642"></div>
+        <div class="field"><label>CUIL</label><input type="text" id="adm-cuil" placeholder="Ej: 20-10349642-0"></div>
+        <div class="field span2"><label>Lugar de Trabajo</label><input type="text" id="adm-lugar" placeholder="Ej: Municipalidad de Tapso"></div>
+        <div class="field"><label>Fecha de Adhesión (MM/AAAA)</label><input type="text" id="adm-adhesion" placeholder="07/2014"></div>
+        <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="adm-retencion" placeholder="07/2014"></div>
+        <div class="field span2"><label>Situación de Revista</label><input type="text" id="adm-revista" placeholder="Ej: Jubilación"></div>
+        <div class="field"><label>N° de Informe</label><input type="text" id="adm-ninforme" placeholder="Ej: 681"></div>
+        <div class="field"><label>Fecha del Documento</label><input type="date" id="adm-fecha-doc"></div>
       </div>
     </div>
   </div>
 
-  <!-- SECCIÓN A -->
   <div class="card">
     <div class="card-header">A · Aportes al Régimen de Asignación Complementaria Dcto 127/11</div>
     <div class="card-body">
-      <div class="field" style="margin-bottom:14px;">
+      <div class="field" style="margin-bottom:13px;">
         <label>Re-afiliación a la Caja Complementaria Dcto 127/11</label>
         <div class="radio-group">
-          <label><input type="radio" name="reafiliacion" value="sin" checked> Sin Re-afiliación</label>
-          <label><input type="radio" name="reafiliacion" value="con"> Con Re-afiliación</label>
+          <label><input type="radio" name="adm-reafil" value="sin" checked> Sin Re-afiliación</label>
+          <label><input type="radio" name="adm-reafil" value="con"> Con Re-afiliación</label>
         </div>
       </div>
       <table class="tabla-a">
-        <thead>
-          <tr><th>Concepto</th><th style="text-align:center">Cargo Administrativo</th></tr>
-        </thead>
+        <thead><tr><th class="left">Concepto</th><th>Cargo Administrativo</th></tr></thead>
         <tbody>
-          <tr><td>Períodos Aportados de APORTES (a la alícuota vigente)</td><td style="text-align:center"><input type="number" id="a-ap2" value="0" min="0" oninput="calcTotalA()"></td></tr>
-          <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="a-sac" value="0" min="0" oninput="calcTotalA()"></td></tr>
-          <tr><td>Períodos Descontados de DEUDA (a la alícuota vigente)</td><td style="text-align:center"><input type="number" id="a-desc5" value="0" min="0" oninput="calcTotalA()"></td></tr>
-          <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="a-adeud" value="0" min="0" oninput="calcTotalA()"></td></tr>
-          <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span id="total-periodos">0</span></td></tr>
+          <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-ap2" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="adm-sac" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="adm-adeud" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="adm-total-a">0</span></td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- SECCIÓN B -->
   <div class="card">
     <div class="card-header">B · Aportes Sistema de Seguridad Social</div>
     <div class="card-body">
-
-      <div class="field" style="margin-bottom:18px;">
+      <div class="field" style="margin-bottom:16px;">
         <label>Estado de la Certificación de Servicio</label>
         <div class="radio-group">
-          <label><input type="radio" name="certif" value="observada" checked onchange="recalcular()"> Observada (no coincide con base de datos)</label>
-          <label><input type="radio" name="certif" value="ok" onchange="recalcular()"> Conforme</label>
+          <label><input type="radio" name="adm-certif" value="observada" checked onchange="recalcularAdm()"> Observada (no coincide con base de datos)</label>
+          <label><input type="radio" name="adm-certif" value="ok" onchange="recalcularAdm()"> Conforme</label>
         </div>
       </div>
-
       <div class="secb-grid">
-
-        <!-- BLOQUE CERTIFICACIÓN DE SERVICIOS -->
         <div class="secb-bloque">
           <div class="secb-bloque-header certif">📄 Certificación de Servicios (Afiliado)</div>
           <div class="secb-bloque-body">
-            <p style="font-size:11px;color:#666;margin-bottom:8px;">Intervalos declarados por el afiliado</p>
-            <div class="intervalos-wrapper" id="certif-trab-list"></div>
+            <div class="intervalos-wrapper" id="adm-certif-trab-list"></div>
             <div class="section-btns">
-              <button class="btn-add certif" onclick="agregarIntervalo('certif-trab')">＋ Intervalo</button>
+              <button class="btn-add certif" onclick="agregarIntervalo('adm','certif-trab')">＋ Intervalo</button>
               <span class="excl-sep">|</span>
-              <button class="btn-add excl-certif" onclick="agregarIntervalo('certif-excl')">− Excluir</button>
+              <button class="btn-add excl-certif" onclick="agregarIntervalo('adm','certif-excl')">− Excluir</button>
             </div>
-            <div class="intervalos-wrapper" id="certif-excl-list" style="margin-top:8px;"></div>
+            <div class="intervalos-wrapper" id="adm-certif-excl-list" style="margin-top:7px;"></div>
             <div class="secb-resultado">
               <div class="res-label">Total Certificación</div>
-              <div class="res-valor certif" id="res-certif">—</div>
-              <div class="res-detalle" id="res-certif-det"></div>
+              <div class="res-valor certif" id="adm-res-certif">—</div>
+              <div class="res-detalle" id="adm-res-certif-det"></div>
             </div>
           </div>
         </div>
-
-        <!-- BLOQUE BASE DE DATOS -->
         <div class="secb-bloque">
           <div class="secb-bloque-header bdd">🗄 Base de Datos (AGAP)</div>
           <div class="secb-bloque-body">
-            <p style="font-size:11px;color:#666;margin-bottom:8px;">Intervalos registrados en nuestra base</p>
-            <div class="intervalos-wrapper" id="bdd-trab-list"></div>
+            <div class="intervalos-wrapper" id="adm-bdd-trab-list"></div>
             <div class="section-btns">
-              <button class="btn-add bdd" onclick="agregarIntervalo('bdd-trab')">＋ Intervalo</button>
+              <button class="btn-add bdd" onclick="agregarIntervalo('adm','bdd-trab')">＋ Intervalo</button>
               <span class="excl-sep">|</span>
-              <button class="btn-add excl-bdd" onclick="agregarIntervalo('bdd-excl')">− Excluir</button>
+              <button class="btn-add excl-bdd" onclick="agregarIntervalo('adm','bdd-excl')">− Excluir</button>
             </div>
-            <div class="intervalos-wrapper" id="bdd-excl-list" style="margin-top:8px;"></div>
+            <div class="intervalos-wrapper" id="adm-bdd-excl-list" style="margin-top:7px;"></div>
             <div class="secb-resultado">
               <div class="res-label">Total Base de Datos</div>
-              <div class="res-valor bdd" id="res-bdd">—</div>
-              <div class="res-detalle" id="res-bdd-det"></div>
+              <div class="res-valor bdd" id="adm-res-bdd">—</div>
+              <div class="res-detalle" id="adm-res-bdd-det"></div>
             </div>
           </div>
         </div>
-
       </div>
-
-      <!-- ALERTA DIFERENCIA -->
-      <div class="alerta-diferencia" id="alerta-box">
-        <div class="alerta-icon" id="alerta-icon"></div>
-        <div>
-          <div class="alerta-titulo" id="alerta-titulo"></div>
-          <div class="alerta-detalle" id="alerta-detalle"></div>
-        </div>
+      <div class="alerta-diferencia" id="adm-alerta-box">
+        <div class="alerta-icon" id="adm-alerta-icon"></div>
+        <div><div class="alerta-titulo" id="adm-alerta-titulo"></div><div class="alerta-detalle" id="adm-alerta-detalle"></div></div>
       </div>
-
     </div>
   </div>
 
-  <!-- FRASE FINAL -->
   <div class="card">
     <div class="card-header">Frase Final del Informe</div>
     <div class="card-body">
       <div class="field">
         <label>Texto de cierre</label>
-        <textarea id="frase-final" rows="3" style="width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;color:#222;resize:vertical;font-family:Arial,sans-serif;">Los datos consignados son correctos y completos que se ha confeccionado este informe sin omitir ni falsear datos alguno que deba contener, siendo fiel expresión de la verdad.-</textarea>
+        <textarea id="adm-frase-final" rows="3">Los datos consignados son correctos y completos que se ha confeccionado este informe sin omitir ni falsear datos alguno que deba contener, siendo fiel expresión de la verdad.-</textarea>
       </div>
     </div>
   </div>
 
-  <!-- BOTÓN GENERAR -->
-  <button class="btn-generar" id="btn-generar" onclick="generarWord()">⬇ Generar Word (.docx)</button>
+  <button class="btn-generar" onclick="generarAdm()">⬇ Generar Word – Cargo Administrativo</button>
+</div>
+</div>
 
+<!-- ═══════════════════════════════════════════════════════════════
+     PESTAÑA 2: MIXTO
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-mixto" class="tab-content">
+<div class="container">
+
+  <div class="card">
+    <div class="card-header">Datos del Agente</div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field span2"><label>Apellido y Nombres</label><input type="text" id="mix-nombre" placeholder="Ej: Peschiutta, Héctor Omar Enrique"></div>
+        <div class="field"><label>DNI</label><input type="text" id="mix-dni" placeholder="Ej: 12.433.246"></div>
+        <div class="field"><label>CUIL</label><input type="text" id="mix-cuil" placeholder="Ej: 20-12433246-0"></div>
+        <div class="field span2"><label>Lugar de Trabajo – Cargo Administrativo</label><input type="text" id="mix-lugar-adm" placeholder="Ej: Dir. Provincial de Administración"></div>
+        <div class="field span2"><label>Lugar de Trabajo – Cargo Docente</label><input type="text" id="mix-lugar-doc" placeholder="Ej: Escuela Secundaria EDJA Nº 50"></div>
+        <div class="field"><label>Fecha de Adhesión (MM/AAAA)</label><input type="text" id="mix-adhesion" placeholder="07/2014"></div>
+        <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="mix-retencion" placeholder="07/2014"></div>
+        <div class="field span2"><label>Situación de Revista</label><input type="text" id="mix-revista" placeholder="Ej: Jubilación"></div>
+        <div class="field"><label>N° de Informe</label><input type="text" id="mix-ninforme" placeholder="Ej: 309"></div>
+        <div class="field"><label>Fecha del Documento</label><input type="date" id="mix-fecha-doc"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">A · Aportes al Régimen de Asignación Complementaria Dcto 127/11</div>
+    <div class="card-body">
+      <div class="field" style="margin-bottom:13px;">
+        <label>Re-afiliación a la Caja Complementaria Dcto 127/11</label>
+        <div class="radio-group">
+          <label><input type="radio" name="mix-reafil" value="sin" checked> Sin Re-afiliación</label>
+          <label><input type="radio" name="mix-reafil" value="con"> Con Re-afiliación</label>
+        </div>
+      </div>
+      <table class="tabla-a">
+        <thead><tr><th class="left">Concepto</th><th>Cargo Administrativo</th><th>Cargo Docente</th></tr></thead>
+        <tbody>
+          <tr><td>Períodos Aportados S/Normativa</td><td style="text-align:center"><input type="number" id="mix-adm-ap2" value="0" min="0" oninput="calcTotalMix()"></td><td style="text-align:center"><input type="number" id="mix-doc-ap2" value="0" min="0" oninput="calcTotalMix()"></td></tr>
+          <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="mix-adm-sac" value="0" min="0" step="0.5" oninput="calcTotalMix()"></td><td style="text-align:center"><input type="number" id="mix-doc-sac" value="0" min="0" step="0.5" oninput="calcTotalMix()"></td></tr>
+          <tr><td>Períodos Descontados</td><td style="text-align:center"><input type="number" id="mix-adm-desc" value="0" min="0" oninput="calcTotalMix()"></td><td style="text-align:center"><input type="number" id="mix-doc-desc" value="0" min="0" oninput="calcTotalMix()"></td></tr>
+          <tr><td>Períodos Depositados</td><td style="text-align:center"><input type="number" id="mix-adm-dep" value="0" min="0" oninput="calcTotalMix()"></td><td style="text-align:center"><input type="number" id="mix-doc-dep" value="0" min="0" oninput="calcTotalMix()"></td></tr>
+          <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="mix-adm-adeud" value="0" min="0" oninput="calcTotalMix()"></td><td style="text-align:center"><input type="number" id="mix-doc-adeud" value="0" min="0" oninput="calcTotalMix()"></td></tr>
+          <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="mix-total-adm">0</span></td><td style="text-align:center"><span class="total-val" id="mix-total-doc">0</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">B · Aportes Sistema de Seguridad Social – Cargo Administrativo</div>
+    <div class="card-body">
+      <div class="field" style="margin-bottom:14px;">
+        <label>Estado de la Certificación</label>
+        <div class="radio-group">
+          <label><input type="radio" name="mix-certif-adm" value="observada" checked onchange="recalcularMixAdm()"> Observada</label>
+          <label><input type="radio" name="mix-certif-adm" value="ok" onchange="recalcularMixAdm()"> Conforme</label>
+        </div>
+      </div>
+      <div class="secb-grid">
+        <div class="secb-bloque">
+          <div class="secb-bloque-header certif">📄 Certificación (Afiliado) – Adm.</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="mix-adm-certif-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add certif" onclick="agregarIntervalo('mix-adm','certif-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-certif" onclick="agregarIntervalo('mix-adm','certif-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="mix-adm-certif-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total Certificación Adm.</div><div class="res-valor certif" id="mix-adm-res-certif">—</div><div class="res-detalle" id="mix-adm-res-certif-det"></div></div>
+          </div>
+        </div>
+        <div class="secb-bloque">
+          <div class="secb-bloque-header bdd">🗄 Base de Datos – Adm.</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="mix-adm-bdd-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add bdd" onclick="agregarIntervalo('mix-adm','bdd-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-bdd" onclick="agregarIntervalo('mix-adm','bdd-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="mix-adm-bdd-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total BDD Adm.</div><div class="res-valor bdd" id="mix-adm-res-bdd">—</div><div class="res-detalle" id="mix-adm-res-bdd-det"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="alerta-diferencia" id="mix-adm-alerta-box">
+        <div class="alerta-icon" id="mix-adm-alerta-icon"></div>
+        <div><div class="alerta-titulo" id="mix-adm-alerta-titulo"></div><div class="alerta-detalle" id="mix-adm-alerta-detalle"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">B · Aportes Sistema de Seguridad Social – Cargo Docente</div>
+    <div class="card-body">
+      <div class="field" style="margin-bottom:14px;">
+        <label>Estado de la Certificación</label>
+        <div class="radio-group">
+          <label><input type="radio" name="mix-certif-doc" value="observada" checked onchange="recalcularMixDoc()"> Observada</label>
+          <label><input type="radio" name="mix-certif-doc" value="ok" onchange="recalcularMixDoc()"> Conforme</label>
+        </div>
+      </div>
+      <div class="secb-grid">
+        <div class="secb-bloque">
+          <div class="secb-bloque-header certif">📄 Certificación (Afiliado) – Doc.</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="mix-doc-certif-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add certif" onclick="agregarIntervalo('mix-doc','certif-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-certif" onclick="agregarIntervalo('mix-doc','certif-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="mix-doc-certif-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total Certificación Doc.</div><div class="res-valor certif" id="mix-doc-res-certif">—</div><div class="res-detalle" id="mix-doc-res-certif-det"></div></div>
+          </div>
+        </div>
+        <div class="secb-bloque">
+          <div class="secb-bloque-header bdd">🗄 Base de Datos – Doc.</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="mix-doc-bdd-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add bdd" onclick="agregarIntervalo('mix-doc','bdd-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-bdd" onclick="agregarIntervalo('mix-doc','bdd-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="mix-doc-bdd-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total BDD Doc.</div><div class="res-valor bdd" id="mix-doc-res-bdd">—</div><div class="res-detalle" id="mix-doc-res-bdd-det"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="alerta-diferencia" id="mix-doc-alerta-box">
+        <div class="alerta-icon" id="mix-doc-alerta-icon"></div>
+        <div><div class="alerta-titulo" id="mix-doc-alerta-titulo"></div><div class="alerta-detalle" id="mix-doc-alerta-detalle"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">C · Ponderación</div>
+    <div class="card-body">
+      <p style="font-size:12px;color:#666;margin-bottom:12px;">Ingresá el Sueldo Bruto de cada cargo. Los demás valores se calculan automáticamente.</p>
+      <table class="pond-tabla">
+        <thead><tr><th>Cargo</th><th>Sueldo Bruto</th><th>Retención (6%)</th><th>Períodos</th><th>Total a Ponderar</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="left">Administrativo</td>
+            <td><input type="text" id="mix-pond-sueldo-adm" placeholder="985.509,40" oninput="calcPonderacion()"></td>
+            <td><span class="calc-val" id="mix-pond-ret-adm">—</span></td>
+            <td><span class="calc-val" id="mix-pond-per-adm">—</span></td>
+            <td><span class="calc-val" id="mix-pond-tot-adm">—</span></td>
+          </tr>
+          <tr>
+            <td class="left">Docente</td>
+            <td><input type="text" id="mix-pond-sueldo-doc" placeholder="604.955,80" oninput="calcPonderacion()"></td>
+            <td><span class="calc-val" id="mix-pond-ret-doc">—</span></td>
+            <td><span class="calc-val" id="mix-pond-per-doc">—</span></td>
+            <td><span class="calc-val" id="mix-pond-tot-doc">—</span></td>
+          </tr>
+          <tr class="total-row">
+            <td class="left">TOTAL</td>
+            <td>—</td>
+            <td><span class="total-val" id="mix-pond-ret-total">—</span></td>
+            <td><span class="total-val" id="mix-pond-per-total">—</span></td>
+            <td><span class="total-val" id="mix-pond-tot-total">—</span></td>
+          </tr>
+          <tr class="result-row">
+            <td class="left" colspan="2">Monto a Ponderar / Retención Total / Períodos Ponderados</td>
+            <td><span id="mix-pond-monto">—</span></td>
+            <td><span id="mix-pond-ret-final">—</span></td>
+            <td><span id="mix-pond-periodos-pond">—</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Frase Final del Informe</div>
+    <div class="card-body">
+      <div class="field">
+        <textarea id="mix-frase-final" rows="3">Los datos consignados son correctos y completos que se ha confeccionado este informe sin omitir ni falsear datos alguno que deba contener, siendo fiel expresión de la verdad.-</textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generar" onclick="generarMixto()">⬇ Generar Word – Cargo Mixto</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PESTAÑA 3: PENSIÓN
+══════════════════════════════════════════════════════════════════ -->
+<div id="tab-pension" class="tab-content">
+<div class="container">
+
+  <div class="card">
+    <div class="card-header">Datos del Beneficiario y Titular</div>
+    <div class="card-body">
+      <div class="form-grid">
+        <div class="field span2" style="background:#eef3f8;padding:10px;border-radius:6px;border-left:3px solid #1565c0;">
+          <label style="color:#1565c0;">Beneficiario</label>
+        </div>
+        <div class="field span2"><label>Apellido y Nombres (Beneficiario)</label><input type="text" id="pen-ben-nombre" placeholder="Ej: Méndez, Josefina Leonor"></div>
+        <div class="field"><label>DNI (Beneficiario)</label><input type="text" id="pen-ben-dni" placeholder="Ej: 12.122.983"></div>
+        <div class="field"><label>CUIL (Beneficiario)</label><input type="text" id="pen-ben-cuil" placeholder="Ej: 27-12122983-3"></div>
+        <div class="field span2" style="background:#eef3f8;padding:10px;border-radius:6px;border-left:3px solid #2e7d32; margin-top:6px;">
+          <label style="color:#2e7d32;">Titular</label>
+        </div>
+        <div class="field span2"><label>Apellido y Nombres (Titular)</label><input type="text" id="pen-tit-nombre" placeholder="Ej: Cabrera, Luis Alberto"></div>
+        <div class="field"><label>DNI (Titular)</label><input type="text" id="pen-tit-dni" placeholder="Ej: 12.688.497"></div>
+        <div class="field"><label>CUIL (Titular)</label><input type="text" id="pen-tit-cuil" placeholder="Ej: 20-12688497-5"></div>
+        <hr class="divider span2">
+        <div class="field span2"><label>Lugar de Trabajo</label><input type="text" id="pen-lugar" placeholder="Ej: Ministerio de Salud"></div>
+        <div class="field"><label>Fecha de Adhesión (MM/AAAA)</label><input type="text" id="pen-adhesion" placeholder="07/2014"></div>
+        <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="pen-retencion" placeholder="07/2014"></div>
+        <div class="field span2"><label>Situación de Revista</label><input type="text" id="pen-revista" placeholder="Ej: Pensión Derivada" value="Pensión Derivada"></div>
+        <div class="field"><label>N° de Informe</label><input type="text" id="pen-ninforme" placeholder="Ej: 483"></div>
+        <div class="field"><label>Fecha del Documento</label><input type="date" id="pen-fecha-doc"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">A · Aportes al Régimen de Asignación Complementaria Dcto 127/11</div>
+    <div class="card-body">
+      <div class="field" style="margin-bottom:13px;">
+        <label>Re-afiliación a la Caja Complementaria Dcto 127/11</label>
+        <div class="radio-group">
+          <label><input type="radio" name="pen-reafil" value="sin" checked> Sin Re-afiliación</label>
+          <label><input type="radio" name="pen-reafil" value="con"> Con Re-afiliación</label>
+        </div>
+      </div>
+      <table class="tabla-a">
+        <thead><tr><th class="left">Concepto</th><th>Cargo Administrativo</th></tr></thead>
+        <tbody>
+          <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="pen-ap2" value="0" min="0" oninput="calcTotalPen()"></td></tr>
+          <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="pen-sac" value="0" min="0" oninput="calcTotalPen()"></td></tr>
+          <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="pen-desc5" value="0" min="0" oninput="calcTotalPen()"></td></tr>
+          <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="pen-adeud" value="0" min="0" oninput="calcTotalPen()"></td></tr>
+          <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="pen-total-a">0</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">B · Aportes Sistema de Seguridad Social</div>
+    <div class="card-body">
+      <div class="field" style="margin-bottom:16px;">
+        <label>Estado de la Certificación de Servicio</label>
+        <div class="radio-group">
+          <label><input type="radio" name="pen-certif" value="observada" checked onchange="recalcularPen()"> Observada</label>
+          <label><input type="radio" name="pen-certif" value="ok" onchange="recalcularPen()"> Conforme</label>
+        </div>
+      </div>
+      <div class="secb-grid">
+        <div class="secb-bloque">
+          <div class="secb-bloque-header certif">📄 Certificación de Servicios (Afiliado)</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="pen-certif-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add certif" onclick="agregarIntervalo('pen','certif-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-certif" onclick="agregarIntervalo('pen','certif-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="pen-certif-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total Certificación</div><div class="res-valor certif" id="pen-res-certif">—</div><div class="res-detalle" id="pen-res-certif-det"></div></div>
+          </div>
+        </div>
+        <div class="secb-bloque">
+          <div class="secb-bloque-header bdd">🗄 Base de Datos (AGAP)</div>
+          <div class="secb-bloque-body">
+            <div class="intervalos-wrapper" id="pen-bdd-trab-list"></div>
+            <div class="section-btns">
+              <button class="btn-add bdd" onclick="agregarIntervalo('pen','bdd-trab')">＋ Intervalo</button>
+              <span class="excl-sep">|</span>
+              <button class="btn-add excl-bdd" onclick="agregarIntervalo('pen','bdd-excl')">− Excluir</button>
+            </div>
+            <div class="intervalos-wrapper" id="pen-bdd-excl-list" style="margin-top:7px;"></div>
+            <div class="secb-resultado"><div class="res-label">Total Base de Datos</div><div class="res-valor bdd" id="pen-res-bdd">—</div><div class="res-detalle" id="pen-res-bdd-det"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="alerta-diferencia" id="pen-alerta-box">
+        <div class="alerta-icon" id="pen-alerta-icon"></div>
+        <div><div class="alerta-titulo" id="pen-alerta-titulo"></div><div class="alerta-detalle" id="pen-alerta-detalle"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Frase Final del Informe</div>
+    <div class="card-body">
+      <div class="field">
+        <textarea id="pen-frase-final" rows="3">Los datos consignados son correctos y completos que se ha confeccionado este informe sin omitir ni falsear datos alguno que deba contener, siendo fiel expresión de la verdad.-</textarea>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generar" onclick="generarPension()">⬇ Generar Word – Pensión</button>
+</div>
 </div>
 
 <div class="toast" id="toast">✔ Documento generado correctamente</div>
-
 <script>
-// ─── Contadores por grupo ──────────────────────────────────────────────────────
-const counters = { 'certif-trab': 0, 'certif-excl': 0, 'bdd-trab': 0, 'bdd-excl': 0 };
-
-const listIds = {
-  'certif-trab': 'certif-trab-list',
-  'certif-excl': 'certif-excl-list',
-  'bdd-trab':    'bdd-trab-list',
-  'bdd-excl':    'bdd-excl-list',
-};
-
-const rowClass = {
-  'certif-trab': 'certif',
-  'certif-excl': 'excluido-certif',
-  'bdd-trab':    'bdd',
-  'bdd-excl':    'excluido-bdd',
-};
-
-// ─── Sección A ────────────────────────────────────────────────────────────────
-function calcTotalA() {
-  const ap2   = parseInt(document.getElementById('a-ap2').value)   || 0;
-  const sac   = parseInt(document.getElementById('a-sac').value)   || 0;
-  const desc5 = parseInt(document.getElementById('a-desc5').value) || 0;
-  const adeud = parseInt(document.getElementById('a-adeud').value) || 0;
-  document.getElementById('total-periodos').textContent = ap2 + sac - desc5 - adeud;
+// ═══════════════════════════════════════════════════════
+// PESTAÑAS
+// ═══════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.currentTarget.classList.add('active');
 }
 
-// ─── Agregar intervalo ─────────────────────────────────────────────────────────
-function agregarIntervalo(grupo) {
-  const list = document.getElementById(listIds[grupo]);
-  const id   = ++counters[grupo];
-  const key  = grupo + '-' + id;
-  const cls  = rowClass[grupo];
+// ═══════════════════════════════════════════════════════
+// UTILIDADES COMUNES
+// ═══════════════════════════════════════════════════════
+const counters = {};
 
-  const div = document.createElement('div');
-  div.className = 'intervalo-row ' + cls;
-  div.id = 'row-' + key;
-  div.innerHTML = `
-    <div>
-      <span class="mini-label">Desde</span>
-      <input type="date" id="desde-${key}" onchange="recalcular()">
-    </div>
-    <div>
-      <span class="mini-label">Hasta</span>
-      <input type="date" id="hasta-${key}" onchange="recalcular()">
-    </div>
-    <button class="btn-remove" onclick="eliminarIntervalo('${key}')" title="Eliminar">✕</button>
-  `;
-  list.appendChild(div);
-}
-
-function eliminarIntervalo(key) {
-  const row = document.getElementById('row-' + key);
-  if (row) { row.remove(); recalcular(); }
-}
-
-// ─── Cálculo de tiempo ─────────────────────────────────────────────────────────
 function diasEntre(desde, hasta) {
-  const d1 = new Date(desde + 'T00:00:00');
-  const d2 = new Date(hasta + 'T00:00:00');
+  const d1 = new Date(desde + 'T00:00:00'), d2 = new Date(hasta + 'T00:00:00');
   const ms = d2 - d1;
   return ms >= 0 ? Math.round(ms / 86400000) : 0;
-}
-
-function sumarDiasGrupo(grupo) {
-  let total = 0;
-  const list = document.getElementById(listIds[grupo]);
-  list.querySelectorAll('.intervalo-row').forEach(row => {
-    const key  = row.id.replace('row-', '');
-    const desde = document.getElementById('desde-' + key)?.value;
-    const hasta  = document.getElementById('hasta-'  + key)?.value;
-    if (desde && hasta) total += diasEntre(desde, hasta);
-  });
-  return total;
 }
 
 function diasAAMD(totalDias) {
@@ -20547,159 +20751,264 @@ function fmtAMD(a, m, d) {
   return `${a} año${a!==1?'s':''}, ${m} mes${m!==1?'es':''}, ${d} día${d!==1?'s':''}`;
 }
 
-function recalcular() {
-  // Certificación
-  const diasCertifTrab = sumarDiasGrupo('certif-trab');
-  const diasCertifExcl = sumarDiasGrupo('certif-excl');
-  const netoC = Math.max(0, diasCertifTrab - diasCertifExcl);
-  const rC = diasAAMD(netoC);
-
-  // Base de Datos
-  const diasBddTrab = sumarDiasGrupo('bdd-trab');
-  const diasBddExcl = sumarDiasGrupo('bdd-excl');
-  const netoB = Math.max(0, diasBddTrab - diasBddExcl);
-  const rB = diasAAMD(netoB);
-
-  // Mostrar resultados
-  document.getElementById('res-certif').textContent = fmtAMD(rC.a, rC.m, rC.d);
-  document.getElementById('res-certif-det').textContent = `Trabajados: ${diasCertifTrab}d  |  Excluidos: ${diasCertifExcl}d  |  Neto: ${netoC}d`;
-  document.getElementById('res-bdd').textContent = fmtAMD(rB.a, rB.m, rB.d);
-  document.getElementById('res-bdd-det').textContent = `Trabajados: ${diasBddTrab}d  |  Excluidos: ${diasBddExcl}d  |  Neto: ${netoB}d`;
-
-  // Diferencia en días
-  const difDias = Math.abs(netoC - netoB);
-  const difAnios = difDias / 365;
-
-  const certifObservada = document.querySelector('input[name=certif]:checked')?.value === 'observada';
-  const alerta = document.getElementById('alerta-box');
-  const icon   = document.getElementById('alerta-icon');
-  const titulo = document.getElementById('alerta-titulo');
-  const detalle= document.getElementById('alerta-detalle');
-
-  if (certifObservada && difAnios > 5) {
-    // ALERTA: diferencia > 5 años con certificación observada
-    alerta.className = 'alerta-diferencia danger';
-    icon.textContent = '⚠️';
-    titulo.textContent = 'DEVOLVER A ATENCIÓN';
-    const { a: da, m: dm, d: dd } = diasAAMD(difDias);
-    detalle.textContent = `La diferencia entre la Certificación de Servicios y la Base de Datos es de ${fmtAMD(da, dm, dd)} (${difDias} días). Supera el límite de 5 años permitido para certificación observada.`;
-    document.getElementById('btn-generar').disabled = false; // igual se puede generar, solo es aviso
-  } else if (certifObservada && netoC > 0 && netoB > 0) {
-    // Observada pero diferencia aceptable
-    alerta.className = 'alerta-diferencia ok';
-    icon.textContent = '✅';
-    titulo.textContent = 'Diferencia dentro del rango aceptable';
-    const { a: da, m: dm, d: dd } = diasAAMD(difDias);
-    detalle.textContent = `Diferencia: ${fmtAMD(da, dm, dd)}. La certificación está observada pero la diferencia no supera los 5 años.`;
-  } else {
-    alerta.className = 'alerta-diferencia';
-    alerta.style.display = 'none';
-  }
-
-  // Guardar para el docx
-  window._resCertif = { ...rC, neto: netoC };
-  window._resBdd    = { ...rB, neto: netoB };
-  window._difDias   = difDias;
-  window._difAnios  = difAnios;
+function parsePesos(str) {
+  if (!str) return 0;
+  // soporta "985.509,40" o "985509.40"
+  const clean = str.replace(/\./g,'').replace(',','.');
+  return parseFloat(clean) || 0;
 }
 
-// ─── Obtener intervalos para el docx ──────────────────────────────────────────
-function getIntervalos(grupo) {
-  const out = [];
-  const list = document.getElementById(listIds[grupo]);
+function fmtPesos(n) {
+  return n.toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function agregarIntervalo(prefix, tipo) {
+  const key = prefix + '-' + tipo;
+  if (!counters[key]) counters[key] = 0;
+  const id = ++counters[key];
+  const rowKey = key + '-' + id;
+  const listId = prefix + '-' + tipo + '-list';
+  const list = document.getElementById(listId);
+  const cls = tipo.includes('certif-trab') ? 'certif'
+             : tipo.includes('bdd-trab')   ? 'bdd'
+             : tipo.includes('certif-excl')? 'excluido-certif'
+             : 'excluido-bdd';
+  const recalcFn = prefix.startsWith('adm') ? 'recalcularAdm()'
+                 : prefix.startsWith('mix-adm') ? 'recalcularMixAdm()'
+                 : prefix.startsWith('mix-doc') ? 'recalcularMixDoc()'
+                 : 'recalcularPen()';
+  const div = document.createElement('div');
+  div.className = 'intervalo-row ' + cls;
+  div.id = 'row-' + rowKey;
+  div.innerHTML = `
+    <div><span class="mini-label">Desde</span><input type="date" id="desde-${rowKey}" onchange="${recalcFn}"></div>
+    <div><span class="mini-label">Hasta</span><input type="date" id="hasta-${rowKey}" onchange="${recalcFn}"></div>
+    <button class="btn-remove" onclick="eliminarIntervalo('${rowKey}')" title="Eliminar">✕</button>`;
+  list.appendChild(div);
+}
+
+function eliminarIntervalo(rowKey) {
+  const row = document.getElementById('row-' + rowKey);
+  if (row) row.remove();
+  // recalcular todos (simple)
+  recalcularAdm(); recalcularMixAdm(); recalcularMixDoc(); recalcularPen();
+}
+
+function sumarDiasLista(listId) {
+  let total = 0;
+  const list = document.getElementById(listId);
+  if (!list) return 0;
   list.querySelectorAll('.intervalo-row').forEach(row => {
-    const key  = row.id.replace('row-', '');
-    const desde = document.getElementById('desde-' + key)?.value;
-    const hasta  = document.getElementById('hasta-'  + key)?.value;
+    const k = row.id.replace('row-', '');
+    const desde = document.getElementById('desde-' + k)?.value;
+    const hasta  = document.getElementById('hasta-'  + k)?.value;
+    if (desde && hasta) total += diasEntre(desde, hasta);
+  });
+  return total;
+}
+
+function getIntervalosLista(listId) {
+  const out = [];
+  const list = document.getElementById(listId);
+  if (!list) return out;
+  list.querySelectorAll('.intervalo-row').forEach(row => {
+    const k = row.id.replace('row-', '');
+    const desde = document.getElementById('desde-' + k)?.value;
+    const hasta  = document.getElementById('hasta-'  + k)?.value;
     if (desde && hasta) out.push({ desde, hasta, dias: diasEntre(desde, hasta) });
   });
   return out;
 }
 
+function actualizarAlerta(boxId, iconId, tituloId, detalleId, certifObservada, difDias, difAnios, netoC, netoB) {
+  const alerta  = document.getElementById(boxId);
+  const icon    = document.getElementById(iconId);
+  const titulo  = document.getElementById(tituloId);
+  const detalle = document.getElementById(detalleId);
+  alerta.style.display = '';
+  if (certifObservada && difAnios > 5) {
+    alerta.className = 'alerta-diferencia danger';
+    icon.textContent = '⚠️';
+    titulo.textContent = 'DEVOLVER A ATENCIÓN';
+    const { a:da, m:dm, d:dd } = diasAAMD(difDias);
+    detalle.textContent = `Diferencia: ${fmtAMD(da, dm, dd)} (${difDias} días). Supera el límite de 5 años.`;
+  } else if (certifObservada && netoC > 0 && netoB > 0) {
+    alerta.className = 'alerta-diferencia ok';
+    icon.textContent = '✅';
+    titulo.textContent = 'Diferencia dentro del rango aceptable';
+    const { a:da, m:dm, d:dd } = diasAAMD(difDias);
+    detalle.textContent = `Diferencia: ${fmtAMD(da, dm, dd)}. Certificación observada pero no supera 5 años.`;
+  } else {
+    alerta.className = 'alerta-diferencia';
+  }
+}
+
+function calcularBloque(prefix, sufCertifTrab, sufCertifExcl, sufBddTrab, sufBddExcl,
+                         resCertifId, resCertifDetId, resBddId, resBddDetId,
+                         certifObservada) {
+  const dCT = sumarDiasLista(prefix + '-' + sufCertifTrab + '-list');
+  const dCE = sumarDiasLista(prefix + '-' + sufCertifExcl + '-list');
+  const dBT = sumarDiasLista(prefix + '-' + sufBddTrab + '-list');
+  const dBE = sumarDiasLista(prefix + '-' + sufBddExcl + '-list');
+  const netoC = Math.max(0, dCT - dCE);
+  const netoB = Math.max(0, dBT - dBE);
+  const rC = diasAAMD(netoC), rB = diasAAMD(netoB);
+  document.getElementById(resCertifId).textContent = fmtAMD(rC.a, rC.m, rC.d);
+  document.getElementById(resCertifDetId).textContent = `Trab: ${dCT}d | Excl: ${dCE}d | Neto: ${netoC}d`;
+  document.getElementById(resBddId).textContent = fmtAMD(rB.a, rB.m, rB.d);
+  document.getElementById(resBddDetId).textContent = `Trab: ${dBT}d | Excl: ${dBE}d | Neto: ${netoB}d`;
+  const difDias = Math.abs(netoC - netoB);
+  return { rC, rB, netoC, netoB, difDias, difAnios: difDias / 365 };
+}
+
+// ═══════════════════════════════════════════════════════
+// PESTAÑA ADM
+// ═══════════════════════════════════════════════════════
+function calcTotalAdm() {
+  const ap2 = +document.getElementById('adm-ap2').value||0;
+  const sac = +document.getElementById('adm-sac').value||0;
+  const desc= +document.getElementById('adm-desc5').value||0;
+  const ade = +document.getElementById('adm-adeud').value||0;
+  document.getElementById('adm-total-a').textContent = ap2 + sac - desc - ade;
+}
+
+function recalcularAdm() {
+  const certifObs = document.querySelector('input[name=adm-certif]:checked')?.value === 'observada';
+  const res = calcularBloque('adm','certif-trab','certif-excl','bdd-trab','bdd-excl',
+    'adm-res-certif','adm-res-certif-det','adm-res-bdd','adm-res-bdd-det', certifObs);
+  actualizarAlerta('adm-alerta-box','adm-alerta-icon','adm-alerta-titulo','adm-alerta-detalle',
+    certifObs, res.difDias, res.difAnios, res.netoC, res.netoB);
+  window._admRes = res;
+}
+
+// ═══════════════════════════════════════════════════════
+// PESTAÑA MIXTO
+// ═══════════════════════════════════════════════════════
+function calcTotalMix() {
+  const g = (id) => +document.getElementById(id).value||0;
+  const totAdm = g('mix-adm-ap2')+g('mix-adm-sac')-g('mix-adm-desc')-g('mix-adm-dep')-g('mix-adm-adeud');
+  const totDoc = g('mix-doc-ap2')+g('mix-doc-sac')-g('mix-doc-desc')-g('mix-doc-dep')-g('mix-doc-adeud');
+  document.getElementById('mix-total-adm').textContent = totAdm;
+  document.getElementById('mix-total-doc').textContent = totDoc;
+  calcPonderacion();
+}
+
+function recalcularMixAdm() {
+  const certifObs = document.querySelector('input[name=mix-certif-adm]:checked')?.value === 'observada';
+  const res = calcularBloque('mix-adm','certif-trab','certif-excl','bdd-trab','bdd-excl',
+    'mix-adm-res-certif','mix-adm-res-certif-det','mix-adm-res-bdd','mix-adm-res-bdd-det', certifObs);
+  actualizarAlerta('mix-adm-alerta-box','mix-adm-alerta-icon','mix-adm-alerta-titulo','mix-adm-alerta-detalle',
+    certifObs, res.difDias, res.difAnios, res.netoC, res.netoB);
+  window._mixAdmRes = res;
+}
+
+function recalcularMixDoc() {
+  const certifObs = document.querySelector('input[name=mix-certif-doc]:checked')?.value === 'observada';
+  const res = calcularBloque('mix-doc','certif-trab','certif-excl','bdd-trab','bdd-excl',
+    'mix-doc-res-certif','mix-doc-res-certif-det','mix-doc-res-bdd','mix-doc-res-bdd-det', certifObs);
+  actualizarAlerta('mix-doc-alerta-box','mix-doc-alerta-icon','mix-doc-alerta-titulo','mix-doc-alerta-detalle',
+    certifObs, res.difDias, res.difAnios, res.netoC, res.netoB);
+  window._mixDocRes = res;
+}
+
+function calcPonderacion() {
+  const sueldoAdm = parsePesos(document.getElementById('mix-pond-sueldo-adm').value);
+  const sueldoDoc = parsePesos(document.getElementById('mix-pond-sueldo-doc').value);
+  const perAdm = parseFloat(document.getElementById('mix-total-adm').textContent) || 0;
+  const perDoc = parseFloat(document.getElementById('mix-total-doc').textContent) || 0;
+
+  const retAdm = sueldoAdm * 0.06;
+  const retDoc = sueldoDoc * 0.06;
+  const totAdm = sueldoAdm * perAdm;
+  const totDoc = sueldoDoc * perDoc;
+  const retTotal = retAdm + retDoc;
+  const perTotal = perAdm + perDoc;
+  const montoTotal = totAdm + totDoc;
+  const periodosPond = retTotal > 0 ? montoTotal / (sueldoAdm > 0 || sueldoDoc > 0 ? (sueldoAdm + sueldoDoc) : 1) * perTotal / montoTotal * perTotal : 0;
+  // Fórmula correcta: períodos ponderados = monto total / retención total * ... 
+  // Según el ejemplo: 15.637.613,38 / 95.427,91 ≈ 163.87 → monto/retención_unitaria
+  // Retención unitaria = retTotal / perTotal
+  const retUnitaria = perTotal > 0 ? retTotal / perTotal : 0;
+  const perPond = retUnitaria > 0 ? montoTotal / (montoTotal / perTotal) : 0;
+  // Fórmula real del ejemplo: periodosPond = montoTotal / (montoTotal/perTotal) = perTotal... no
+  // Del ejemplo: 11.027.850,19 + 4.609.763,20 = 15.637.613,38 ; 95.427,91 ; 163,87
+  // 15.637.613,38 / 95.427,91 = 163.87 → monto_total / retencion_total = periodos_ponderados
+  const perPondFinal = retTotal > 0 ? montoTotal / retTotal : 0;
+
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  set('mix-pond-ret-adm',   sueldoAdm ? '$ ' + fmtPesos(retAdm) : '—');
+  set('mix-pond-per-adm',   perAdm || '—');
+  set('mix-pond-tot-adm',   sueldoAdm ? '$ ' + fmtPesos(totAdm) : '—');
+  set('mix-pond-ret-doc',   sueldoDoc ? '$ ' + fmtPesos(retDoc) : '—');
+  set('mix-pond-per-doc',   perDoc || '—');
+  set('mix-pond-tot-doc',   sueldoDoc ? '$ ' + fmtPesos(totDoc) : '—');
+  set('mix-pond-ret-total', retTotal ? '$ ' + fmtPesos(retTotal) : '—');
+  set('mix-pond-per-total', perTotal || '—');
+  set('mix-pond-tot-total', montoTotal ? '$ ' + fmtPesos(montoTotal) : '—');
+  set('mix-pond-monto',     montoTotal ? '$ ' + fmtPesos(montoTotal) : '—');
+  set('mix-pond-ret-final', retTotal ? '$ ' + fmtPesos(retTotal) : '—');
+  set('mix-pond-periodos-pond', perPondFinal ? fmtPesos(perPondFinal) : '—');
+
+  window._pondData = { sueldoAdm, sueldoDoc, retAdm, retDoc, totAdm, totDoc,
+    retTotal, perTotal, montoTotal, perPondFinal, perAdm, perDoc };
+}
+
+// ═══════════════════════════════════════════════════════
+// PESTAÑA PENSIÓN
+// ═══════════════════════════════════════════════════════
+function calcTotalPen() {
+  const ap2 = +document.getElementById('pen-ap2').value||0;
+  const sac = +document.getElementById('pen-sac').value||0;
+  const desc= +document.getElementById('pen-desc5').value||0;
+  const ade = +document.getElementById('pen-adeud').value||0;
+  document.getElementById('pen-total-a').textContent = ap2 + sac - desc - ade;
+}
+
+function recalcularPen() {
+  const certifObs = document.querySelector('input[name=pen-certif]:checked')?.value === 'observada';
+  const res = calcularBloque('pen','certif-trab','certif-excl','bdd-trab','bdd-excl',
+    'pen-res-certif','pen-res-certif-det','pen-res-bdd','pen-res-bdd-det', certifObs);
+  actualizarAlerta('pen-alerta-box','pen-alerta-icon','pen-alerta-titulo','pen-alerta-detalle',
+    certifObs, res.difDias, res.difAnios, res.netoC, res.netoB);
+  window._penRes = res;
+}
+
+// ═══════════════════════════════════════════════════════
+// GENERADOR WORD – HELPERS COMUNES
+// ═══════════════════════════════════════════════════════
 function fechaLarga(iso) {
-  if (!iso) return '';
-  const meses = ['enero','febrero','marzo','abril','mayo','junio',
-                  'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  if (!iso) return '_______________';
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const [y, m, d] = iso.split('-');
   return `${parseInt(d)} de ${meses[parseInt(m)-1]} de ${y}`;
 }
 
-// ─── Generar Word ──────────────────────────────────────────────────────────────
-async function generarWord() {
-  const {
-    Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-    AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign, UnderlineType
-  } = docx;
-
-  const nombre   = document.getElementById('nombre').value    || '_______________';
-  const dni      = document.getElementById('dni').value       || '_______________';
-  const cuil     = document.getElementById('cuil').value      || '_______________';
-  const lugar    = document.getElementById('lugar').value     || '_______________';
-  const adhesion = document.getElementById('adhesion').value  || '_______________';
-  const reten    = document.getElementById('retencion').value || '_______________';
-  const revista  = document.getElementById('revista').value   || '_______________';
-  const nInf     = document.getElementById('ninforme').value  || '___';
-  const fechaDoc = document.getElementById('fecha-doc').value;
-  const fechaDocStr = fechaDoc ? fechaLarga(fechaDoc) : '_______________';
-
-  const reafil  = document.querySelector('input[name=reafiliacion]:checked')?.value || 'sin';
-  const certif  = document.querySelector('input[name=certif]:checked')?.value || 'observada';
-
-  const ap2   = document.getElementById('a-ap2').value   || '0';
-  const sac   = document.getElementById('a-sac').value   || '0';
-  const desc5 = document.getElementById('a-desc5').value || '0';
-  const adeud = document.getElementById('a-adeud').value || '0';
-  const totalA = document.getElementById('total-periodos').textContent;
-  const fraseFinal = (document.getElementById('frase-final').value || '').trim() ||
-    'Los datos consignados son correctos y completos que se ha confeccionado este informe sin omitir ni falsear datos alguno que deba contener, siendo fiel expresión de la verdad.-';
-
-  const rC = window._resCertif || { a:0, m:0, d:0 };
-  const rB = window._resBdd    || { a:0, m:0, d:0 };
-  const difDias  = window._difDias  || 0;
-  const difAnios = window._difAnios || 0;
-
-  const certifTrab = getIntervalos('certif-trab');
-  const certifExcl = getIntervalos('certif-excl');
-  const bddTrab    = getIntervalos('bdd-trab');
-  const bddExcl    = getIntervalos('bdd-excl');
-
-  // ── Helpers ────────────────────────────────────────────────────────────────
+function buildDocHelpers(docxLib) {
+  const { Paragraph, TextRun, Table, TableRow, TableCell,
+          AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign, UnderlineType } = docxLib;
   const noBorder   = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' };
-  const noBorders  = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
   const thinBorder = { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC' };
   const thinBorders= { top: thinBorder, bottom: thinBorder, left: thinBorder, right: thinBorder };
-  const HS = '1a3a5c';
-  const AS = 'f0f4f8';
+  const noBorders  = { top: noBorder, bottom: noBorder, left: noBorder, right: noBorder };
+  const HS = '1a3a5c', AS = 'f0f4f8';
 
   const p = (text, opts={}) => new Paragraph({
     alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
     spacing: { before: opts.before||0, after: opts.after||80 },
-    children: [new TextRun({
-      text, bold: opts.bold||false, size: opts.size||22, font:'Arial',
+    children: [new TextRun({ text, bold:opts.bold||false, size:opts.size||22, font:'Arial',
       underline: opts.underline ? { type: UnderlineType.SINGLE } : undefined,
-      italics: opts.italic||false, color: opts.color||'000000',
-    })]
+      italics: opts.italic||false, color: opts.color||'000000' })]
   });
 
-  const pMulti = (runs, opts={}) => new Paragraph({
+  const pM = (runs, opts={}) => new Paragraph({
     alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
     spacing: { before: opts.before||0, after: opts.after||80 },
-    children: runs.map(r => new TextRun({
-      text: r.text, bold: r.bold||false, size: r.size||22, font:'Arial',
-      underline: r.underline ? { type: UnderlineType.SINGLE } : undefined,
-      color: r.color||'000000',
-    }))
+    children: runs.map(r => new TextRun({ text:r.text, bold:r.bold||false, size:r.size||22,
+      font:'Arial', color:r.color||'000000',
+      underline: r.underline ? { type: UnderlineType.SINGLE } : undefined }))
   });
 
-  const cell = (children, opts={}) => new TableCell({
-    children, borders: opts.borders||thinBorders,
-    width: opts.width ? { size: opts.width, type: WidthType.DXA } : undefined,
-    shading: opts.shading ? { fill: opts.shading, type: ShadingType.CLEAR } : undefined,
-    margins: { top:80, bottom:80, left:120, right:120 },
-    verticalAlign: VerticalAlign.CENTER, columnSpan: opts.span||1,
-  });
-
-  const thCell = (text, w, span) => new TableCell({
+  const th = (text, w, span) => new TableCell({
     children: [new Paragraph({ alignment: AlignmentType.CENTER,
       children: [new TextRun({ text, bold:true, size:18, font:'Arial', color:'FFFFFF' })] })],
     shading: { fill: HS, type: ShadingType.CLEAR },
@@ -20708,177 +21017,361 @@ async function generarWord() {
     borders: thinBorders, columnSpan: span||1, verticalAlign: VerticalAlign.CENTER,
   });
 
-  const tdCell = (text, w, opts={}) => new TableCell({
+  const td = (text, w, opts={}) => new TableCell({
     children: [new Paragraph({ alignment: opts.center ? AlignmentType.CENTER : AlignmentType.LEFT,
-      children: [new TextRun({ text, bold: opts.bold||false, size:18, font:'Arial', color: opts.color||'000000' })] })],
+      children: [new TextRun({ text, bold:opts.bold||false, size:18, font:'Arial', color:opts.color||'000000' })] })],
     width: { size: w, type: WidthType.DXA },
     margins: { top:60, bottom:60, left:80, right:80 },
     borders: thinBorders, verticalAlign: VerticalAlign.CENTER,
     shading: opts.shading ? { fill: opts.shading, type: ShadingType.CLEAR } : undefined,
+    columnSpan: opts.span||1,
   });
 
-  // ── Tabla Sección A ────────────────────────────────────────────────────────
-  const desc5Val = parseInt(desc5) > 0 ? desc5 : '-.-';
-  const adeudVal = parseInt(adeud) > 0 ? adeud : '-.-';
-
-  const tblA = new Table({
-    width: { size: 9360, type: WidthType.DXA },
-    columnWidths: [7000, 2360],
-    rows: [
-      new TableRow({ children: [
-        new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT, children:[new TextRun({text:'Concepto',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:7000,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
-        new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT, children:[new TextRun({text:'Cargo Administrativo / Cantidad',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:2360,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
-      ]}),
-      new TableRow({children:[cell([p('Períodos Aportados a la alícuota vigente',{size:20})],{width:7000}), cell([p(ap2,{size:20,center:true})],{width:2360})]}),
-      new TableRow({children:[cell([p('SAC Aportados',{size:20})],{width:7000,shading:AS}), cell([p(sac,{size:20,center:true})],{width:2360,shading:AS})]}),
-      new TableRow({children:[cell([p('Períodos Descontados a la alícuota vigente',{size:20})],{width:7000}), cell([p(desc5Val,{size:20,center:true})],{width:2360})]}),
-      new TableRow({children:[cell([p('Períodos Adeudados',{size:20})],{width:7000,shading:AS}), cell([p(adeudVal,{size:20,center:true})],{width:2360,shading:AS})]}),
-      new TableRow({children:[cell([pMulti([{text:'Total Períodos Aportados',bold:true,size:20}])],{width:7000}), cell([pMulti([{text:totalA,bold:true,size:20}])],{width:2360})]}),
-    ]
-  });
-
-  // ── Helper tabla de intervalos para el Word ────────────────────────────────
-  // Columnas: Cargo(1300) | Periodo(1200) | D_d(700) D_m(700) D_y(700) | H_d(700) H_m(700) H_y(700) | Tiempo(1360)
-  // Total = 9360
-  const colWidths = [1300, 1200, 700, 700, 700, 700, 700, 700, 1360];
-
-  const buildTablaIntervalos = (titulo, intervalos, excluidos, resA, resM, resD) => {
-    const headerRow1 = new TableRow({ children: [
-      thCell('Cargo',       1300),
-      thCell('Periodo',     1200),
-      thCell('Desde',       2100, 3),
-      thCell('Hasta',       2100, 3),
-      thCell('Tiempo\nTrabajado', 1360),
-    ]});
-    const subHeader = new TableRow({ children: [
-      thCell('', 1300), thCell('', 1200),
-      thCell('Día',700), thCell('Mes',700), thCell('Año',700),
-      thCell('Día',700), thCell('Mes',700), thCell('Año',700),
-      thCell('', 1360),
-    ]});
-    const bussRow = new TableRow({ children: [
-      tdCell('BUSS',1300,{center:true}), tdCell('-',1200,{center:true}),
-      tdCell('-',700,{center:true}), tdCell('-',700,{center:true}), tdCell('-',700,{center:true}),
-      tdCell('-',700,{center:true}), tdCell('-',700,{center:true}), tdCell('-',700,{center:true}),
-      tdCell('-',1360,{center:true}),
-    ]});
-
-    const filas = intervalos.map((iv, i) => {
-      const [dy, dm, dd] = iv.desde.split('-');
-      const [hy, hm, hd] = iv.hasta.split('-');
-      const { a, m, d } = diasAAMD(iv.dias);
-      const shade = i % 2 === 1 ? AS : undefined;
-      return new TableRow({ children: [
-        tdCell('Reporte',1300,{center:true,shading:shade}),
-        tdCell('',1200,{center:true,shading:shade}),
-        tdCell(dd,700,{center:true,shading:shade}), tdCell(dm,700,{center:true,shading:shade}), tdCell(dy,700,{center:true,shading:shade}),
-        tdCell(hd,700,{center:true,shading:shade}), tdCell(hm,700,{center:true,shading:shade}), tdCell(hy,700,{center:true,shading:shade}),
-        tdCell(`${a}a ${m}m ${d}d`,1360,{center:true,shading:shade}),
-      ]});
-    });
-
-    const totalStr = `${resA}a ${resM}m ${resD}d`;
-    const totalRow = new TableRow({ children: [
-      new TableCell({
-        children: [new Paragraph({ alignment: AlignmentType.LEFT,
-          children: [new TextRun({ text: `Total ${titulo}`, bold:true, size:18, font:'Arial' })] })],
-        columnSpan: 9, borders: thinBorders,
-        margins: { top:60, bottom:60, left:120, right:120 },
-        shading: { fill: AS, type: ShadingType.CLEAR },
-      }),
-      tdCell(totalStr, 1360, {center:true, bold:true, shading:AS}),
-    ]});
-
-    return new Table({
-      width: { size: 9360, type: WidthType.DXA },
-      columnWidths: colWidths,
-      rows: [headerRow1, subHeader, bussRow, ...filas, totalRow],
-    });
-  };
-
-  // ── Bloque alerta en el Word (si aplica) ────────────────────────────────────
-  const alertaChildren = [];
-  if (certif === 'observada' && difAnios > 5) {
-    const { a:da, m:dm, d:dd } = diasAAMD(difDias);
-    alertaChildren.push(
-      p('⚠ DEVOLVER A ATENCIÓN', { bold:true, size:24, color:'C0392B', before:200, after:60 }),
-      p(`La diferencia entre la Certificación de Servicios y la Base de Datos es de ${fmtAMD(da,dm,dd)} (${difDias} días), superando el límite de 5 años permitido para certificación observada.`,
-        { size:20, color:'C0392B', after:200 }),
-    );
-  }
-
-  // ── Construir documento ────────────────────────────────────────────────────
-  const docChildren = [
+  const encabezado = (fechaDocStr, nInf, nombre) => [
     p('Gobierno de Catamarca', { bold:true, center:true, size:24, after:20 }),
-    p('2025', { center:true, size:22, after:20 }),
+    p('2026', { center:true, size:22, after:20 }),
     p('', { after:20 }),
     p('Informe', { bold:true, center:true, size:24, underline:true, after:40 }),
     p('SAN FERNANDO DEL VALLE DE CATAMARCA, CATAMARCA', { center:true, size:20, color:'1F5599', after:20 }),
     p(fechaDocStr, { center:true, size:20, after:120 }),
-    pMulti([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2025 - T${nInf} - ${nombre}.-`,size:22}], {after:240}),
-    p('Informe Cargo Administrativo', { bold:true, center:true, size:24, underline:true, before:120, after:240 }),
-    pMulti([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}], {after:160}),
-    pMulti([{text:'Apellido y Nombres: ',bold:true,size:26},{text:nombre+'.',size:26}], {after:160}),
-    pMulti([{text:'DNI N°: ',bold:true,size:22},{text:dni,size:22},{text:'          CUIL N°: ',bold:true,size:22},{text:cuil,size:22}], {after:160}),
-    pMulti([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugar+'.',size:22}], {after:160}),
-    pMulti([{text:'Fecha Adhesión: ',bold:true,size:22},{text:adhesion,size:22}], {after:160}),
-    pMulti([{text:'Periodo de Retención: ',bold:true,size:22},{text:reten,size:22}], {after:160}),
-    pMulti([{text:'Situación de Revista: ',bold:true,size:22},{text:revista+'.-',size:22}], {after:360}),
-
-    p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-', { bold:true, size:22, before:120, after:160 }),
-    p(reafil==='sin' ? 'Sin Re-afiliación a la caja complementaria Dcto 127/11.-' : 'Con Re-afiliación a la caja complementaria Dcto 127/11.-', { size:20, before:60, after:160 }),
-    tblA,
-    p(reafil==='sin'
-      ? '*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.'
-      : '*El Agente registra re-afiliación a la Caja Complementaria.',
-      { italic:true, size:18, before:120, after:360 }),
-
-    p('B.  Aportes Sistema de Seguridad Social.', { bold:true, size:22, before:120, after:160 }),
-    p(certif==='observada'
-      ? 'Certificación de servicio Observada, por No Coincidir con la base de datos de aportes.'
-      : 'Certificación de servicio Conforme.',
-      { size:20, before:60, after:200 }),
-
-    p('Certificación de Servicios (según Afiliado):', { bold:true, size:20, before:120, after:100 }),
-    buildTablaIntervalos('Certificación de Servicios', certifTrab, certifExcl, rC.a, rC.m, rC.d),
-    p('', { after:160 }),
-
-    p('Base de Datos (AGAP):', { bold:true, size:20, before:120, after:100 }),
-    buildTablaIntervalos('Base de Datos', bddTrab, bddExcl, rB.a, rB.m, rB.d),
-    p('', { after:160 }),
-
-    ...alertaChildren,
-
-    p(fraseFinal, { size:20, after:240 }),
-    p(`Informe D.P.G.P.A. N°: ${nInf}/2025.-`, { bold:true, size:22, after:0 }),
   ];
 
-  const doc = new Document({
-    sections: [{
-      properties: { page: {
-        size: { width: 11906, height: 16838 },
-        margin: { top: 1134, right: 1134, bottom: 1134, left: 1134 },
-      }},
-      children: docChildren,
-    }]
-  });
+  const pieFrase = (frase, nInf) => [
+    p(frase, { size:20, after:240 }),
+    p(`Informe D.P.G.P.A. N°: ${nInf}/2026.-`, { bold:true, size:22, after:0 }),
+  ];
 
+  // Tabla A de una columna (Administrativo o Pensión)
+  const tablaA1col = (ap2, sac, desc5, adeud, total, colTitulo) => {
+    const desc5Val = parseInt(desc5)>0 ? desc5 : '-.-';
+    const adeudVal = parseInt(adeud)>0 ? adeud : '-.-';
+    return new Table({
+      width: { size:9360, type:WidthType.DXA }, columnWidths: [7000, 2360],
+      rows: [
+        new TableRow({ children: [
+          new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT, children:[new TextRun({text:'Concepto',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:7000,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
+          new TableCell({ children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:colTitulo,bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:2360,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
+        ]}),
+        new TableRow({children:[td('Períodos Aportados a la alícuota vigente',7000,{size:20}), td(ap2,2360,{center:true})]}),
+        new TableRow({children:[td('SAC Aportados',7000,{shading:AS}), td(sac,2360,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Períodos Descontados a la alícuota vigente',7000), td(desc5Val,2360,{center:true})]}),
+        new TableRow({children:[td('Períodos Adeudados',7000,{shading:AS}), td(adeudVal,2360,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Total Períodos Aportados',7000,{bold:true}), td(total,2360,{center:true,bold:true})]}),
+      ]
+    });
+  };
+
+  // Tabla A de dos columnas (Mixto)
+  const tablaA2col = (admAp2, admSac, admDesc, admDep, admAdeud, admTotal,
+                      docAp2, docSac, docDesc, docDep, docAdeud, docTotal) => {
+    const w0=4800, w1=2280, w2=2280;
+    return new Table({
+      width:{size:9360,type:WidthType.DXA}, columnWidths:[w0,w1,w2],
+      rows:[
+        new TableRow({children:[
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:'Concepto',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})],shading:{fill:HS,type:ShadingType.CLEAR},width:{size:w0,type:WidthType.DXA},margins:{top:80,bottom:80,left:120,right:120},borders:thinBorders}),
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'Cargo Administrativo',bold:true,size:18,font:'Arial',color:'FFFFFF'})]})],shading:{fill:HS,type:ShadingType.CLEAR},width:{size:w1,type:WidthType.DXA},margins:{top:80,bottom:80,left:80,right:80},borders:thinBorders}),
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:'Cargo Docente',bold:true,size:18,font:'Arial',color:'FFFFFF'})]})],shading:{fill:HS,type:ShadingType.CLEAR},width:{size:w2,type:WidthType.DXA},margins:{top:80,bottom:80,left:80,right:80},borders:thinBorders}),
+        ]}),
+        new TableRow({children:[td('Períodos Aportados S/Normativa',w0), td(admAp2,w1,{center:true}), td(docAp2,w2,{center:true})]}),
+        new TableRow({children:[td('SAC Aportados',w0,{shading:AS}), td(admSac,w1,{center:true,shading:AS}), td(docSac,w2,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Períodos Descontados',w0), td(admDesc||'-.-',w1,{center:true}), td(docDesc||'-.-',w2,{center:true})]}),
+        new TableRow({children:[td('Períodos Depositados',w0,{shading:AS}), td(admDep||'-.-',w1,{center:true,shading:AS}), td(docDep||'-.-',w2,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Períodos Adeudados',w0), td(admAdeud||'-.-',w1,{center:true}), td(docAdeud||'-.-',w2,{center:true})]}),
+        new TableRow({children:[td('Total Períodos Aportados',w0,{bold:true}), td(admTotal,w1,{center:true,bold:true}), td(docTotal,w2,{center:true,bold:true})]}),
+      ]
+    });
+  };
+
+  // Tabla B intervalos
+  const colsB = [1300, 1200, 700, 700, 700, 700, 700, 700, 1360];
+  const tablaB = (tituloTotal, intervalos, rA, rM, rD) => {
+    const filas = intervalos.map((iv, i) => {
+      const [dy,dm,dd] = iv.desde.split('-');
+      const [hy,hm,hd] = iv.hasta.split('-');
+      const { a, m, d } = diasAAMD(iv.dias);
+      const shade = i%2===1 ? AS : undefined;
+      return new TableRow({ children: [
+        td('Reporte',1300,{center:true,shading:shade}), td('',1200,{center:true,shading:shade}),
+        td(dd,700,{center:true,shading:shade}), td(dm,700,{center:true,shading:shade}), td(dy,700,{center:true,shading:shade}),
+        td(hd,700,{center:true,shading:shade}), td(hm,700,{center:true,shading:shade}), td(hy,700,{center:true,shading:shade}),
+        td(`${a}a ${m}m ${d}d`,1360,{center:true,shading:shade}),
+      ]});
+    });
+    const totalRow = new TableRow({ children: [
+      new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:`Total ${tituloTotal}`,bold:true,size:18,font:'Arial'})]})],
+        columnSpan:9, borders:thinBorders, margins:{top:60,bottom:60,left:120,right:120}, shading:{fill:AS,type:ShadingType.CLEAR} }),
+      td(`${rA}a ${rM}m ${rD}d`,1360,{center:true,bold:true,shading:AS}),
+    ]});
+    return new Table({
+      width:{size:9360,type:WidthType.DXA}, columnWidths:colsB,
+      rows:[
+        new TableRow({children:[th('Cargo',1300),th('Base\nDatos',1200),th('Desde',2100,3),th('Hasta',2100,3),th('Tiempo\nTrabajado',1360)]}),
+        new TableRow({children:[th('',1300),th('',1200),th('Día',700),th('Mes',700),th('Año',700),th('Día',700),th('Mes',700),th('Año',700),th('',1360)]}),
+        new TableRow({children:[td('BUSS',1300,{center:true}),td('-',1200,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',1360,{center:true})]}),
+        ...filas, totalRow,
+      ]
+    });
+  };
+
+  // Tabla Ponderación (Mixto)
+  const tablaPond = (pd) => {
+    const W = [2400,1800,1600,1600,1960];
+    return new Table({
+      width:{size:9360,type:WidthType.DXA}, columnWidths:W,
+      rows:[
+        new TableRow({children:[th('Cargo',W[0]),th('Sueldo Bruto',W[1]),th('Retención (6%)',W[2]),th('Período',W[3]),th('Total a Ponderar',W[4])]}),
+        new TableRow({children:[td('Administrativo',W[0],{bold:true}),td('$ '+fmtPesos(pd.sueldoAdm),W[1],{center:true}),td(fmtPesos(pd.retAdm),W[2],{center:true}),td(String(pd.perAdm),W[3],{center:true}),td('$ '+fmtPesos(pd.totAdm),W[4],{center:true})]}),
+        new TableRow({children:[td('Docente',W[0],{bold:true,shading:AS}),td('$ '+fmtPesos(pd.sueldoDoc),W[1],{center:true,shading:AS}),td(fmtPesos(pd.retDoc),W[2],{center:true,shading:AS}),td(String(pd.perDoc),W[3],{center:true,shading:AS}),td('$ '+fmtPesos(pd.totDoc),W[4],{center:true,shading:AS})]}),
+        new TableRow({children:[td('',W[0]),td('',W[1]),td(fmtPesos(pd.retTotal),W[2],{center:true,bold:true}),td(String(pd.perTotal),W[3],{center:true,bold:true}),td('$ '+fmtPesos(pd.montoTotal),W[4],{center:true,bold:true})]}),
+        new TableRow({children:[
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:'Monto P/Ponderar',bold:true,size:18,font:'Arial'})]})],width:{size:W[0],type:WidthType.DXA},margins:{top:60,bottom:60,left:120,right:120},borders:thinBorders,shading:{fill:AS,type:ShadingType.CLEAR}}),
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:'Retención (6%)',bold:true,size:18,font:'Arial'})]})],width:{size:W[1],type:WidthType.DXA},margins:{top:60,bottom:60,left:120,right:120},borders:thinBorders,shading:{fill:AS,type:ShadingType.CLEAR}}),
+          new TableCell({children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:'Cantidad de Períodos Ponderados',bold:true,size:18,font:'Arial'})]})],columnSpan:3,borders:thinBorders,margins:{top:60,bottom:60,left:120,right:120},shading:{fill:AS,type:ShadingType.CLEAR}}),
+        ]}),
+        new TableRow({children:[td('$ '+fmtPesos(pd.montoTotal),W[0],{center:true,bold:true}),td('$ '+fmtPesos(pd.retTotal),W[1],{center:true,bold:true}),new TableCell({children:[new Paragraph({alignment:AlignmentType.CENTER,children:[new TextRun({text:fmtPesos(pd.perPondFinal),bold:true,size:18,font:'Arial'})]})],columnSpan:3,borders:thinBorders,margins:{top:60,bottom:60,left:80,right:80}})]}),
+      ]
+    });
+  };
+
+  const alertaWordChildren = (certif, difDias, difAnios) => {
+    if (certif === 'observada' && difAnios > 5) {
+      const { a:da, m:dm, d:dd } = diasAAMD(difDias);
+      return [
+        p('⚠ DEVOLVER A ATENCIÓN', { bold:true, size:24, color:'C0392B', before:200, after:60 }),
+        p(`Diferencia: ${fmtAMD(da,dm,dd)} (${difDias} días). Supera el límite de 5 años.`, { size:20, color:'C0392B', after:200 }),
+      ];
+    }
+    return [];
+  };
+
+  const docProps = {
+    sections: [{ properties: { page: {
+      size: { width:11906, height:16838 },
+      margin: { top:1134, right:1134, bottom:1134, left:1134 }
+    }}}]
+  };
+
+  return { p, pM, th, td, tablaA1col, tablaA2col, tablaB, tablaPond,
+           encabezado, pieFrase, alertaWordChildren, docProps, thinBorders, AS, HS,
+           AlignmentType, WidthType, ShadingType, VerticalAlign, BorderStyle };
+}
+
+// ═══════════════════════════════════════════════════════
+// GENERAR WORD – ADMINISTRATIVO
+// ═══════════════════════════════════════════════════════
+async function generarAdm() {
+  const { Document, Packer } = docx;
+  const H = buildDocHelpers(docx);
+  const g = id => document.getElementById(id)?.value || '';
+
+  const nombre = g('adm-nombre')||'___'; const dni = g('adm-dni')||'___';
+  const cuil = g('adm-cuil')||'___'; const lugar = g('adm-lugar')||'___';
+  const adhesion = g('adm-adhesion')||'___'; const reten = g('adm-retencion')||'___';
+  const revista = g('adm-revista')||'___'; const nInf = g('adm-ninforme')||'___';
+  const fechaDocStr = fechaLarga(g('adm-fecha-doc'));
+  const reafil = document.querySelector('input[name=adm-reafil]:checked')?.value||'sin';
+  const certif = document.querySelector('input[name=adm-certif]:checked')?.value||'observada';
+  const ap2 = g('adm-ap2')||'0'; const sac = g('adm-sac')||'0';
+  const desc5 = g('adm-desc5')||'0'; const adeud = g('adm-adeud')||'0';
+  const totalA = document.getElementById('adm-total-a').textContent;
+  const frase = g('adm-frase-final')||'Los datos consignados son correctos y completos...';
+  const res = window._admRes || { rB:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
+
+  const ivBddTrab = getIntervalosLista('adm-bdd-trab-list');
+  const ivCertTrab= getIntervalosLista('adm-certif-trab-list');
+
+  const children = [
+    ...H.encabezado(fechaDocStr, nInf, nombre),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${nombre}.-`,size:22}],{after:240}),
+    H.p('Informe Cargo Administrativo',{bold:true,center:true,size:24,underline:true,before:120,after:240}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Apellido y Nombres: ',bold:true,size:26},{text:nombre+'.',size:26}],{after:160}),
+    H.pM([{text:'DNI N°: ',bold:true,size:22},{text:dni,size:22},{text:'          CUIL N°: ',bold:true,size:22},{text:cuil,size:22}],{after:160}),
+    H.pM([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugar+'.',size:22}],{after:160}),
+    H.pM([{text:'Fecha Adhesión: ',bold:true,size:22},{text:adhesion,size:22}],{after:160}),
+    H.pM([{text:'Periodo de Retención: ',bold:true,size:22},{text:reten,size:22}],{after:160}),
+    H.pM([{text:'Situación de Revista: ',bold:true,size:22},{text:revista+'.-',size:22}],{after:360}),
+    H.p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-',{bold:true,size:22,before:120,after:160}),
+    H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
+    H.tablaA1col(ap2,sac,desc5,adeud,totalA,'Cargo Administrativo'),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+    H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
+    H.p(certif==='observada'?'Certificación de servicio Observada, por No Coincidir con la base de datos de aportes.':'Los periodos de aportes registrados en la base de datos, coinciden con la Certificación de Servicios y Remuneraciones.',{size:20,before:60,after:200}),
+    H.p('Certificación de Servicios (según Afiliado):',{bold:true,size:20,before:120,after:100}),
+    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0),
+    H.p('',{after:160}),
+    H.p('Base de Datos (AGAP):',{bold:true,size:20,before:120,after:100}),
+    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0),
+    H.p('',{after:160}),
+    ...H.alertaWordChildren(certif, res.difDias||0, res.difAnios||0),
+    ...H.pieFrase(frase, nInf),
+  ];
+
+  const doc = new Document({ sections:[{ properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1134,right:1134,bottom:1134,left:1134} }}, children }] });
   const blob = await Packer.toBlob(doc);
-  const nombreArchivo = `Informe_${nInf}_${nombre.replace(/[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]/g,'').replace(/ /g,'_')}`;
-  saveAs(blob, nombreArchivo + '.docx');
-
-  const toast = document.getElementById('toast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 3000);
+  saveAs(blob, `Informe_Adm_${nInf}_${nombre.replace(/[^a-zA-Z0-9áéíóúñ ]/g,'').replace(/ /g,'_')}.docx`);
+  showToast();
 }
 
-function fmtAMD(a, m, d) {
-  return `${a} año${a!==1?'s':''}, ${m} mes${m!==1?'es':''}, ${d} día${d!==1?'s':''}`;
+// ═══════════════════════════════════════════════════════
+// GENERAR WORD – MIXTO
+// ═══════════════════════════════════════════════════════
+async function generarMixto() {
+  const { Document, Packer } = docx;
+  const H = buildDocHelpers(docx);
+  const g = id => document.getElementById(id)?.value || '';
+
+  const nombre = g('mix-nombre')||'___'; const dni = g('mix-dni')||'___';
+  const cuil = g('mix-cuil')||'___';
+  const lugarAdm = g('mix-lugar-adm')||'___'; const lugarDoc = g('mix-lugar-doc')||'___';
+  const adhesion = g('mix-adhesion')||'___'; const reten = g('mix-retencion')||'___';
+  const revista = g('mix-revista')||'___'; const nInf = g('mix-ninforme')||'___';
+  const fechaDocStr = fechaLarga(g('mix-fecha-doc'));
+  const reafil = document.querySelector('input[name=mix-reafil]:checked')?.value||'sin';
+  const certifAdm = document.querySelector('input[name=mix-certif-adm]:checked')?.value||'observada';
+  const certifDoc = document.querySelector('input[name=mix-certif-doc]:checked')?.value||'observada';
+  const frase = g('mix-frase-final');
+
+  const gv = id => document.getElementById(id)?.value||'0';
+  const totalAdm = document.getElementById('mix-total-adm').textContent;
+  const totalDoc = document.getElementById('mix-total-doc').textContent;
+
+  const resAdm = window._mixAdmRes || { rB:{a:0,m:0,d:0}, rC:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
+  const resDoc = window._mixDocRes || { rB:{a:0,m:0,d:0}, rC:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
+  const pd = window._pondData || {};
+
+  const ivAdmCert = getIntervalosLista('mix-adm-certif-trab-list');
+  const ivAdmBdd  = getIntervalosLista('mix-adm-bdd-trab-list');
+  const ivDocCert = getIntervalosLista('mix-doc-certif-trab-list');
+  const ivDocBdd  = getIntervalosLista('mix-doc-bdd-trab-list');
+
+  const children = [
+    ...H.encabezado(fechaDocStr, nInf, nombre),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${nombre}.-`,size:22}],{after:240}),
+    H.p('Informe Cargo Mixto',{bold:true,center:true,size:24,underline:true,before:120,after:80}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Apellido y Nombres: ',bold:true,size:26},{text:nombre+'.',size:26}],{after:160}),
+    H.pM([{text:'DNI N°: ',bold:true,size:22},{text:dni,size:22},{text:'          CUIL N°: ',bold:true,size:22},{text:cuil,size:22}],{after:160}),
+    H.pM([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugarAdm+' (Cargo Administrativo).',size:22}],{after:80}),
+    H.pM([{text:'                           ',size:22},{text:lugarDoc+' (Cargo Docente).',size:22}],{after:160}),
+    H.pM([{text:'Fecha Adhesión: ',bold:true,size:22},{text:adhesion,size:22}],{after:160}),
+    H.pM([{text:'Periodo de Retención: ',bold:true,size:22},{text:reten,size:22}],{after:160}),
+    H.pM([{text:'Situación de Revista: ',bold:true,size:22},{text:revista+'.-',size:22}],{after:360}),
+
+    H.p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-',{bold:true,size:22,before:120,after:160}),
+    H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
+    H.tablaA2col(gv('mix-adm-ap2'),gv('mix-adm-sac'),gv('mix-adm-desc')||'-.-',gv('mix-adm-dep')||'-.-',gv('mix-adm-adeud')||'-.-',totalAdm,
+                 gv('mix-doc-ap2'),gv('mix-doc-sac'),gv('mix-doc-desc')||'-.-',gv('mix-doc-dep')||'-.-',gv('mix-doc-adeud')||'-.-',totalDoc),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+
+    H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
+    H.p(certifAdm==='observada'?'Certificación de servicio Administrativa Observada, por No Coincidir con la base de datos.':'Los periodos de aportes Administrativos coinciden con la Certificación.',{size:20,before:60,after:120}),
+    H.p('Certificación de Servicios Administrativo (Afiliado):',{bold:true,size:20,before:80,after:80}),
+    H.tablaB('Certificación Administrativo', ivAdmCert, resAdm.rC?.a||0, resAdm.rC?.m||0, resAdm.rC?.d||0),
+    H.p('',{after:100}),
+    H.p('Base de Datos Administrativo (AGAP):',{bold:true,size:20,before:80,after:80}),
+    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivAdmBdd, resAdm.rB?.a||0, resAdm.rB?.m||0, resAdm.rB?.d||0),
+    H.p('',{after:100}),
+    ...H.alertaWordChildren(certifAdm, resAdm.difDias||0, resAdm.difAnios||0),
+
+    H.p(certifDoc==='observada'?'Certificación de servicio Docente Observada, por No Coincidir con la base de datos.':'Los periodos de aportes Docentes coinciden con la Certificación.',{size:20,before:160,after:120}),
+    H.p('Certificación de Servicios Docente (Afiliado):',{bold:true,size:20,before:80,after:80}),
+    H.tablaB('Certificación Docente', ivDocCert, resDoc.rC?.a||0, resDoc.rC?.m||0, resDoc.rC?.d||0),
+    H.p('',{after:100}),
+    H.p('Base de Datos Docente (AGAP):',{bold:true,size:20,before:80,after:80}),
+    H.tablaB('de Aportes y Contribuciones Cargo DOCENTE', ivDocBdd, resDoc.rB?.a||0, resDoc.rB?.m||0, resDoc.rB?.d||0),
+    H.p('',{after:100}),
+    ...H.alertaWordChildren(certifDoc, resDoc.difDias||0, resDoc.difAnios||0),
+
+    H.p('C.  Ponderación.',{bold:true,size:22,before:200,after:160}),
+    H.tablaPond(pd.sueldoAdm ? pd : { sueldoAdm:0,sueldoDoc:0,retAdm:0,retDoc:0,totAdm:0,totDoc:0,retTotal:0,perTotal:0,montoTotal:0,perPondFinal:0,perAdm:parseFloat(totalAdm)||0,perDoc:parseFloat(totalDoc)||0 }),
+    H.p('',{after:160}),
+    ...H.pieFrase(frase, nInf),
+  ];
+
+  const doc = new Document({ sections:[{ properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1134,right:1134,bottom:1134,left:1134} }}, children }] });
+  const blob = await Packer.toBlob(doc);
+  saveAs(blob, `Informe_Mixto_${nInf}_${nombre.replace(/[^a-zA-Z0-9áéíóúñ ]/g,'').replace(/ /g,'_')}.docx`);
+  showToast();
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────────
-agregarIntervalo('certif-trab');
-agregarIntervalo('bdd-trab');
+// ═══════════════════════════════════════════════════════
+// GENERAR WORD – PENSIÓN
+// ═══════════════════════════════════════════════════════
+async function generarPension() {
+  const { Document, Packer } = docx;
+  const H = buildDocHelpers(docx);
+  const g = id => document.getElementById(id)?.value || '';
+
+  const benNombre = g('pen-ben-nombre')||'___'; const benDni = g('pen-ben-dni')||'___';
+  const benCuil   = g('pen-ben-cuil')||'___';
+  const titNombre = g('pen-tit-nombre')||'___'; const titDni = g('pen-tit-dni')||'___';
+  const titCuil   = g('pen-tit-cuil')||'___';
+  const lugar = g('pen-lugar')||'___'; const adhesion = g('pen-adhesion')||'___';
+  const reten = g('pen-retencion')||'___'; const revista = g('pen-revista')||'Pensión Derivada';
+  const nInf = g('pen-ninforme')||'___'; const fechaDocStr = fechaLarga(g('pen-fecha-doc'));
+  const reafil = document.querySelector('input[name=pen-reafil]:checked')?.value||'sin';
+  const certif = document.querySelector('input[name=pen-certif]:checked')?.value||'observada';
+  const ap2 = g('pen-ap2')||'0'; const sac = g('pen-sac')||'0';
+  const desc5 = g('pen-desc5')||'0'; const adeud = g('pen-adeud')||'0';
+  const totalA = document.getElementById('pen-total-a').textContent;
+  const frase = g('pen-frase-final');
+  const res = window._penRes || { rB:{a:0,m:0,d:0}, rC:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
+
+  const ivCertTrab = getIntervalosLista('pen-certif-trab-list');
+  const ivBddTrab  = getIntervalosLista('pen-bdd-trab-list');
+
+  const children = [
+    ...H.encabezado(fechaDocStr, nInf, benNombre),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${benNombre}.-`,size:22}],{after:240}),
+    H.p('Informe Cargo Administrativo',{bold:true,center:true,size:24,underline:true,before:120,after:240}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Beneficiario: ',bold:true,size:22},{text:benNombre,size:22},{text:'    DNI: ',bold:true,size:22},{text:benDni,size:22}],{after:100}),
+    H.pM([{text:'CUIL: ',bold:true,size:22},{text:benCuil,size:22}],{after:160}),
+    H.pM([{text:'Titular: ',bold:true,size:22},{text:titNombre,size:22},{text:'    DNI: ',bold:true,size:22},{text:titDni,size:22}],{after:100}),
+    H.pM([{text:'CUIL: ',bold:true,size:22},{text:titCuil,size:22}],{after:160}),
+    H.pM([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugar+'.',size:22}],{after:160}),
+    H.pM([{text:'Situación de Revista: ',bold:true,size:22},{text:revista+'.',size:22}],{after:360}),
+
+    H.p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-',{bold:true,size:22,before:120,after:160}),
+    H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
+    H.tablaA1col(ap2,sac,desc5,adeud,totalA,'Cargo Administrativo'),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+
+    H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
+    H.p(certif==='observada'?'Certificación de servicio Observada, por No Coincidir con la base de datos de aportes.':'Los periodos de aportes registrados en la base de datos, coinciden con la Certificación de Servicios y Remuneraciones.',{size:20,before:60,after:200}),
+    H.p('Certificación de Servicios (según Afiliado):',{bold:true,size:20,before:120,after:100}),
+    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0),
+    H.p('',{after:160}),
+    H.p('Base de Datos (AGAP):',{bold:true,size:20,before:120,after:100}),
+    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0),
+    H.p('',{after:160}),
+    ...H.alertaWordChildren(certif, res.difDias||0, res.difAnios||0),
+    ...H.pieFrase(frase, nInf),
+  ];
+
+  const doc = new Document({ sections:[{ properties:{ page:{ size:{width:11906,height:16838}, margin:{top:1134,right:1134,bottom:1134,left:1134} }}, children }] });
+  const blob = await Packer.toBlob(doc);
+  saveAs(blob, `Informe_Pension_${nInf}_${benNombre.replace(/[^a-zA-Z0-9áéíóúñ ]/g,'').replace(/ /g,'_')}.docx`);
+  showToast();
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT
+agregarIntervalo('adm','certif-trab');
+agregarIntervalo('adm','bdd-trab');
+agregarIntervalo('mix-adm','certif-trab');
+agregarIntervalo('mix-adm','bdd-trab');
+agregarIntervalo('mix-doc','certif-trab');
+agregarIntervalo('mix-doc','bdd-trab');
+agregarIntervalo('pen','certif-trab');
+agregarIntervalo('pen','bdd-trab');
 </script>
 </body>
 </html>
