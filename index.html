@@ -20317,7 +20317,8 @@ var __async = (__this, __arguments, generator) => {
         <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="adm-retencion" placeholder="07/2014"></div>
         <div class="field span2"><label>Situación de Revista</label><input type="text" id="adm-revista" placeholder="Ej: Jubilación"></div>
         <div class="field"><label>N° de Informe</label><input type="text" id="adm-ninforme" placeholder="Ej: 681"></div>
-        <div class="field"><label>Fecha del Documento</label><input type="date" id="adm-fecha-doc"></div>
+        <div class="field"><label>N° de Trámite</label><input type="text" id="adm-ntramite" placeholder="Ej: 12859"></div>
+        <div class="field span2"><label>Fecha del Documento</label><input type="date" id="adm-fecha-doc"></div>
       </div>
     </div>
   </div>
@@ -20431,7 +20432,8 @@ var __async = (__this, __arguments, generator) => {
         <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="mix-retencion" placeholder="07/2014"></div>
         <div class="field span2"><label>Situación de Revista</label><input type="text" id="mix-revista" placeholder="Ej: Jubilación"></div>
         <div class="field"><label>N° de Informe</label><input type="text" id="mix-ninforme" placeholder="Ej: 309"></div>
-        <div class="field"><label>Fecha del Documento</label><input type="date" id="mix-fecha-doc"></div>
+        <div class="field"><label>N° de Trámite</label><input type="text" id="mix-ntramite" placeholder="Ej: 12859"></div>
+        <div class="field span2"><label>Fecha del Documento</label><input type="date" id="mix-fecha-doc"></div>
       </div>
     </div>
   </div>
@@ -20630,7 +20632,8 @@ var __async = (__this, __arguments, generator) => {
         <div class="field"><label>Período de Retención (MM/AAAA)</label><input type="text" id="pen-retencion" placeholder="07/2014"></div>
         <div class="field span2"><label>Situación de Revista</label><input type="text" id="pen-revista" placeholder="Ej: Pensión Derivada" value="Pensión Derivada"></div>
         <div class="field"><label>N° de Informe</label><input type="text" id="pen-ninforme" placeholder="Ej: 483"></div>
-        <div class="field"><label>Fecha del Documento</label><input type="date" id="pen-fecha-doc"></div>
+        <div class="field"><label>N° de Trámite</label><input type="text" id="pen-ntramite" placeholder="Ej: 12859"></div>
+        <div class="field span2"><label>Fecha del Documento</label><input type="date" id="pen-fecha-doc"></div>
       </div>
     </div>
   </div>
@@ -21108,7 +21111,6 @@ function buildDocHelpers(docxLib) {
       rows:[
         new TableRow({children:[th('Cargo',1300),th('Base\nDatos',1200),th('Desde',2100,3),th('Hasta',2100,3),th('Tiempo\nTrabajado',1360)]}),
         new TableRow({children:[th('',1300),th('',1200),th('Día',700),th('Mes',700),th('Año',700),th('Día',700),th('Mes',700),th('Año',700),th('',1360)]}),
-        new TableRow({children:[td('BUSS',1300,{center:true}),td('-',1200,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',700,{center:true}),td('-',1360,{center:true})]}),
         ...filas, totalRow,
       ]
     });
@@ -21183,9 +21185,9 @@ async function generarAdm() {
 
   const children = [
     ...H.encabezado(fechaDocStr, nInf, nombre),
-    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${nombre}.-`,size:22}],{after:240}),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nTramite} - ${nombre}.-`,size:22}],{after:240}),
     H.p('Informe Cargo Administrativo',{bold:true,center:true,size:24,underline:true,before:120,after:240}),
-    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nTramite,size:26}],{after:160}),
     H.pM([{text:'Apellido y Nombres: ',bold:true,size:26},{text:nombre+'.',size:26}],{after:160}),
     H.pM([{text:'DNI N°: ',bold:true,size:22},{text:dni,size:22},{text:'          CUIL N°: ',bold:true,size:22},{text:cuil,size:22}],{after:160}),
     H.pM([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugar+'.',size:22}],{after:160}),
@@ -21248,9 +21250,9 @@ async function generarMixto() {
 
   const children = [
     ...H.encabezado(fechaDocStr, nInf, nombre),
-    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${nombre}.-`,size:22}],{after:240}),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nTramite} - ${nombre}.-`,size:22}],{after:240}),
     H.p('Informe Cargo Mixto',{bold:true,center:true,size:24,underline:true,before:120,after:80}),
-    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nTramite,size:26}],{after:160}),
     H.pM([{text:'Apellido y Nombres: ',bold:true,size:26},{text:nombre+'.',size:26}],{after:160}),
     H.pM([{text:'DNI N°: ',bold:true,size:22},{text:dni,size:22},{text:'          CUIL N°: ',bold:true,size:22},{text:cuil,size:22}],{after:160}),
     H.pM([{text:'Lugar de Trabajo: ',bold:true,size:22},{text:lugarAdm+' (Cargo Administrativo).',size:22}],{after:80}),
@@ -21324,9 +21326,9 @@ async function generarPension() {
 
   const children = [
     ...H.encabezado(fechaDocStr, nInf, benNombre),
-    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nInf} - ${benNombre}.-`,size:22}],{after:240}),
+    H.pM([{text:'Referencia: ',bold:true,size:22},{text:`Informe ${nInf} - 2026 - T${nTramite} - ${benNombre}.-`,size:22}],{after:240}),
     H.p('Informe Cargo Administrativo',{bold:true,center:true,size:24,underline:true,before:120,after:240}),
-    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nInf,size:26}],{after:160}),
+    H.pM([{text:'Tramite N°: ',bold:true,size:26},{text:nTramite,size:26}],{after:160}),
     H.pM([{text:'Beneficiario: ',bold:true,size:22},{text:benNombre,size:22},{text:'    DNI: ',bold:true,size:22},{text:benDni,size:22}],{after:100}),
     H.pM([{text:'CUIL: ',bold:true,size:22},{text:benCuil,size:22}],{after:160}),
     H.pM([{text:'Titular: ',bold:true,size:22},{text:titNombre,size:22},{text:'    DNI: ',bold:true,size:22},{text:titDni,size:22}],{after:100}),
