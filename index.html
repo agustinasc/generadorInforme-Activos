@@ -21171,6 +21171,7 @@ async function generarAdm() {
   const cuil = g('adm-cuil')||'___'; const lugar = g('adm-lugar')||'___';
   const adhesion = g('adm-adhesion')||'___'; const reten = g('adm-retencion')||'___';
   const revista = g('adm-revista')||'___'; const nInf = g('adm-ninforme')||'___';
+  const nTramite = g('adm-ntramite')||nInf;
   const fechaDocStr = fechaLarga(g('adm-fecha-doc'));
   const reafil = document.querySelector('input[name=adm-reafil]:checked')?.value||'sin';
   const certif = document.querySelector('input[name=adm-certif]:checked')?.value||'observada';
@@ -21229,6 +21230,7 @@ async function generarMixto() {
   const lugarAdm = g('mix-lugar-adm')||'___'; const lugarDoc = g('mix-lugar-doc')||'___';
   const adhesion = g('mix-adhesion')||'___'; const reten = g('mix-retencion')||'___';
   const revista = g('mix-revista')||'___'; const nInf = g('mix-ninforme')||'___';
+  const nTramite = g('mix-ntramite')||nInf;
   const fechaDocStr = fechaLarga(g('mix-fecha-doc'));
   const reafil = document.querySelector('input[name=mix-reafil]:checked')?.value||'sin';
   const certifAdm = document.querySelector('input[name=mix-certif-adm]:checked')?.value||'observada';
@@ -21312,7 +21314,9 @@ async function generarPension() {
   const titCuil   = g('pen-tit-cuil')||'___';
   const lugar = g('pen-lugar')||'___'; const adhesion = g('pen-adhesion')||'___';
   const reten = g('pen-retencion')||'___'; const revista = g('pen-revista')||'Pensión Derivada';
-  const nInf = g('pen-ninforme')||'___'; const fechaDocStr = fechaLarga(g('pen-fecha-doc'));
+  const nInf = g('pen-ninforme')||'___';
+  const nTramite = g('pen-ntramite')||nInf;
+  const fechaDocStr = fechaLarga(g('pen-fecha-doc'));
   const reafil = document.querySelector('input[name=pen-reafil]:checked')?.value||'sin';
   const certif = document.querySelector('input[name=pen-certif]:checked')?.value||'observada';
   const ap2 = g('pen-ap2')||'0'; const sac = g('pen-sac')||'0';
