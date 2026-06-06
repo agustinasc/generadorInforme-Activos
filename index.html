@@ -20736,12 +20736,54 @@ function switchTab(tab) {
 // ═══════════════════════════════════════════════════════
 const counters = {};
 
-function diasEntre(desde, hasta) {
-  const d1 = new Date(desde + 'T00:00:00'), d2 = new Date(hasta + 'T00:00:00');
-  const ms = d2 - d1;
-  return ms >= 0 ? Math.round(ms / 86400000) : 0;
+// Calcula antigüedad exacta entre dos fechas según lógica previsional:
+// días = egreso_dia - ingreso_dia  (si <0, pedir prestado 30 días, restar 1 mes)
+// meses = egreso_mes - ingreso_mes (si <0, pedir prestado 12 meses, restar 1 año)
+// años = egreso_año - ingreso_año
+function calcAMD(desde, hasta) {
+  if (!desde || !hasta) return { a:0, m:0, d:0, valido:false };
+  const [ya, ma, da] = desde.split('-').map(Number); // ingreso
+  const [yb, mb, db] = hasta.split('-').map(Number);  // egreso
+
+  let dias  = db - da;
+  let meses = mb - ma;
+  let anios = yb - ya;
+
+  if (dias < 0) { dias += 30; meses -= 1; }
+  if (meses < 0) { meses += 12; anios -= 1; }
+
+  if (anios < 0) return { a:0, m:0, d:0, valido:false };
+  return { a: anios, m: meses, d: dias, valido:true };
 }
 
+// Suma N pares {a,m,d} en un total {a,m,d}
+function sumarAMD(lista) {
+  let da = 0, dm = 0, dy = 0;
+  for (const { a, m, d } of lista) { da += d; dm += m; dy += a; }
+  dm += Math.floor(da / 30); da = da % 30;
+  dy += Math.floor(dm / 12); dm = dm % 12;
+  return { a: dy, m: dm, d: da };
+}
+
+// Resta {a,m,d} - {a,m,d} (para excluidos)
+function restarAMD(total, excl) {
+  let da = total.d - excl.d;
+  let dm = total.m - excl.m;
+  let dy = total.a - excl.a;
+  if (da < 0) { da += 30; dm -= 1; }
+  if (dm < 0) { dm += 12; dy -= 1; }
+  if (dy < 0) return { a:0, m:0, d:0 };
+  return { a: dy, m: dm, d: da };
+}
+
+// Diferencia absoluta en días aproximados (solo para comparar umbral de 5 años)
+function diffDiasAprox(rC, rB) {
+  const diasC = rC.a*365 + rC.m*30 + rC.d;
+  const diasB = rB.a*365 + rB.m*30 + rB.d;
+  return Math.abs(diasC - diasB);
+}
+
+// Mantener diasAAMD para compatibilidad con alertas (recibe días aprox)
 function diasAAMD(totalDias) {
   const a = Math.floor(totalDias / 365);
   const resto = totalDias - a * 365;
@@ -20798,16 +20840,20 @@ function eliminarIntervalo(rowKey) {
 }
 
 function sumarDiasLista(listId) {
-  let total = 0;
+  // Retorna {a,m,d} sumando todos los intervalos de la lista
   const list = document.getElementById(listId);
-  if (!list) return 0;
+  if (!list) return { a:0, m:0, d:0 };
+  const pares = [];
   list.querySelectorAll('.intervalo-row').forEach(row => {
     const k = row.id.replace('row-', '');
     const desde = document.getElementById('desde-' + k)?.value;
     const hasta  = document.getElementById('hasta-'  + k)?.value;
-    if (desde && hasta) total += diasEntre(desde, hasta);
+    if (desde && hasta) {
+      const r = calcAMD(desde, hasta);
+      if (r.valido) pares.push(r);
+    }
   });
-  return total;
+  return sumarAMD(pares);
 }
 
 function getIntervalosLista(listId) {
@@ -20818,7 +20864,10 @@ function getIntervalosLista(listId) {
     const k = row.id.replace('row-', '');
     const desde = document.getElementById('desde-' + k)?.value;
     const hasta  = document.getElementById('hasta-'  + k)?.value;
-    if (desde && hasta) out.push({ desde, hasta, dias: diasEntre(desde, hasta) });
+    if (desde && hasta) {
+      const amd = calcAMD(desde, hasta);
+      out.push({ desde, hasta, amd });
+    }
   });
   return out;
 }
@@ -20849,19 +20898,20 @@ function actualizarAlerta(boxId, iconId, tituloId, detalleId, certifObservada, d
 function calcularBloque(prefix, sufCertifTrab, sufCertifExcl, sufBddTrab, sufBddExcl,
                          resCertifId, resCertifDetId, resBddId, resBddDetId,
                          certifObservada) {
-  const dCT = sumarDiasLista(prefix + '-' + sufCertifTrab + '-list');
-  const dCE = sumarDiasLista(prefix + '-' + sufCertifExcl + '-list');
-  const dBT = sumarDiasLista(prefix + '-' + sufBddTrab + '-list');
-  const dBE = sumarDiasLista(prefix + '-' + sufBddExcl + '-list');
-  const netoC = Math.max(0, dCT - dCE);
-  const netoB = Math.max(0, dBT - dBE);
-  const rC = diasAAMD(netoC), rB = diasAAMD(netoB);
+  const totCT = sumarDiasLista(prefix + '-' + sufCertifTrab + '-list');
+  const totCE = sumarDiasLista(prefix + '-' + sufCertifExcl + '-list');
+  const totBT = sumarDiasLista(prefix + '-' + sufBddTrab + '-list');
+  const totBE = sumarDiasLista(prefix + '-' + sufBddExcl + '-list');
+  const rC = restarAMD(totCT, totCE);
+  const rB = restarAMD(totBT, totBE);
   document.getElementById(resCertifId).textContent = fmtAMD(rC.a, rC.m, rC.d);
-  document.getElementById(resCertifDetId).textContent = `Trab: ${dCT}d | Excl: ${dCE}d | Neto: ${netoC}d`;
+  document.getElementById(resCertifDetId).textContent =
+    `Trab: ${totCT.a}a ${totCT.m}m ${totCT.d}d | Excl: ${totCE.a}a ${totCE.m}m ${totCE.d}d`;
   document.getElementById(resBddId).textContent = fmtAMD(rB.a, rB.m, rB.d);
-  document.getElementById(resBddDetId).textContent = `Trab: ${dBT}d | Excl: ${dBE}d | Neto: ${netoB}d`;
-  const difDias = Math.abs(netoC - netoB);
-  return { rC, rB, netoC, netoB, difDias, difAnios: difDias / 365 };
+  document.getElementById(resBddDetId).textContent =
+    `Trab: ${totBT.a}a ${totBT.m}m ${totBT.d}d | Excl: ${totBE.a}a ${totBE.m}m ${totBE.d}d`;
+  const difDias = diffDiasAprox(rC, rB);
+  return { rC, rB, difDias, difAnios: difDias / 365 };
 }
 
 // ═══════════════════════════════════════════════════════
@@ -21092,7 +21142,7 @@ function buildDocHelpers(docxLib) {
     const filas = intervalos.map((iv, i) => {
       const [dy,dm,dd] = iv.desde.split('-');
       const [hy,hm,hd] = iv.hasta.split('-');
-      const { a, m, d } = diasAAMD(iv.dias);
+      const { a, m, d } = iv.amd || { a:0, m:0, d:0 };
       const shade = i%2===1 ? AS : undefined;
       return new TableRow({ children: [
         td('Reporte',1300,{center:true,shading:shade}), td('',1200,{center:true,shading:shade}),
@@ -21101,10 +21151,21 @@ function buildDocHelpers(docxLib) {
         td(`${a}a ${m}m ${d}d`,1360,{center:true,shading:shade}),
       ]});
     });
+    const totalStr = `${rA}a ${rM}m ${rD}d`;
     const totalRow = new TableRow({ children: [
-      new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT,children:[new TextRun({text:`Total ${tituloTotal}`,bold:true,size:18,font:'Arial'})]})],
-        columnSpan:9, borders:thinBorders, margins:{top:60,bottom:60,left:120,right:120}, shading:{fill:AS,type:ShadingType.CLEAR} }),
-      td(`${rA}a ${rM}m ${rD}d`,1360,{center:true,bold:true,shading:AS}),
+      new TableCell({
+        children:[new Paragraph({
+          alignment:AlignmentType.LEFT,
+          children:[
+            new TextRun({text:`Total ${tituloTotal}     `,bold:true,size:18,font:'Arial'}),
+            new TextRun({text:totalStr,bold:true,size:18,font:'Arial',color:'1a3a5c'}),
+          ]
+        })],
+        columnSpan:10,
+        borders:thinBorders,
+        margins:{top:60,bottom:60,left:120,right:120},
+        shading:{fill:AS,type:ShadingType.CLEAR}
+      }),
     ]});
     return new Table({
       width:{size:9360,type:WidthType.DXA}, columnWidths:colsB,
