@@ -20339,10 +20339,15 @@ var __async = (__this, __arguments, generator) => {
           <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-ap2" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="adm-sac" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>Períodos Depositados</td><td style="text-align:center"><input type="number" id="adm-dep" value="0" min="0" step="0.5" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="adm-adeud" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="adm-total-a">0</span></td></tr>
         </tbody>
       </table>
+      <div class="field" style="margin-top:14px;">
+        <label>Observaciones Sección A (opcional)</label>
+        <textarea id="adm-obs-a" rows="2" placeholder="Ej: El agente registra deuda de 3 períodos correspondientes a..." style="width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;color:#222;resize:vertical;font-family:Arial,sans-serif;"></textarea>
+      </div>
     </div>
   </div>
 
@@ -20459,6 +20464,10 @@ var __async = (__this, __arguments, generator) => {
           <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="mix-total-adm">0</span></td><td style="text-align:center"><span class="total-val" id="mix-total-doc">0</span></td></tr>
         </tbody>
       </table>
+      <div class="field" style="margin-top:14px;">
+        <label>Observaciones Sección A (opcional)</label>
+        <textarea id="mix-obs-a" rows="2" placeholder="Ej: El agente registra deuda de 3 períodos..." style="width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;color:#222;resize:vertical;font-family:Arial,sans-serif;"></textarea>
+      </div>
     </div>
   </div>
 
@@ -20654,10 +20663,15 @@ var __async = (__this, __arguments, generator) => {
           <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="pen-ap2" value="0" min="0" oninput="calcTotalPen()"></td></tr>
           <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="pen-sac" value="0" min="0" oninput="calcTotalPen()"></td></tr>
           <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="pen-desc5" value="0" min="0" oninput="calcTotalPen()"></td></tr>
+          <tr><td>Períodos Depositados</td><td style="text-align:center"><input type="number" id="pen-dep" value="0" min="0" step="0.5" oninput="calcTotalPen()"></td></tr>
           <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="pen-adeud" value="0" min="0" oninput="calcTotalPen()"></td></tr>
           <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="pen-total-a">0</span></td></tr>
         </tbody>
       </table>
+      <div class="field" style="margin-top:14px;">
+        <label>Observaciones Sección A (opcional)</label>
+        <textarea id="pen-obs-a" rows="2" placeholder="Ej: El agente registra deuda de 3 períodos..." style="width:100%;padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;color:#222;resize:vertical;font-family:Arial,sans-serif;"></textarea>
+      </div>
     </div>
   </div>
 
@@ -20921,8 +20935,9 @@ function calcTotalAdm() {
   const ap2 = +document.getElementById('adm-ap2').value||0;
   const sac = +document.getElementById('adm-sac').value||0;
   const desc= +document.getElementById('adm-desc5').value||0;
+  const dep = +document.getElementById('adm-dep').value||0;
   const ade = +document.getElementById('adm-adeud').value||0;
-  document.getElementById('adm-total-a').textContent = ap2 + sac - desc - ade;
+  document.getElementById('adm-total-a').textContent = ap2 + sac - desc + dep - ade;
 }
 
 function recalcularAdm() {
@@ -21013,8 +21028,9 @@ function calcTotalPen() {
   const ap2 = +document.getElementById('pen-ap2').value||0;
   const sac = +document.getElementById('pen-sac').value||0;
   const desc= +document.getElementById('pen-desc5').value||0;
+  const dep = +document.getElementById('pen-dep').value||0;
   const ade = +document.getElementById('pen-adeud').value||0;
-  document.getElementById('pen-total-a').textContent = ap2 + sac - desc - ade;
+  document.getElementById('pen-total-a').textContent = ap2 + sac - desc + dep - ade;
 }
 
 function recalcularPen() {
@@ -21095,20 +21111,22 @@ function buildDocHelpers(docxLib) {
   ];
 
   // Tabla A de una columna (Administrativo o Pensión)
-  const tablaA1col = (ap2, sac, desc5, adeud, total, colTitulo) => {
-    const desc5Val = parseInt(desc5)>0 ? desc5 : '-.-';
-    const adeudVal = parseInt(adeud)>0 ? adeud : '-.-';
+    const tablaA1col = (ap2, sac, desc5, dep, adeud, total, colTitulo) => {
+    const desc5Val = parseInt(desc5)>0  ? desc5 : '-.-';
+    const depVal   = parseFloat(dep)>0  ? dep   : '-.-';
+    const adeudVal = parseInt(adeud)>0  ? adeud : '-.-';
     return new Table({
       width: { size:9360, type:WidthType.DXA }, columnWidths: [7000, 2360],
       rows: [
         new TableRow({ children: [
-          new TableCell({ children:[new Paragraph({alignment:AlignmentType.LEFT, children:[new TextRun({text:'Concepto',bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:7000,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
-          new TableCell({ children:[new Paragraph({alignment:AlignmentType.CENTER, children:[new TextRun({text:colTitulo,bold:true,size:20,font:'Arial',color:'FFFFFF'})]})], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:2360,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
+          new TableCell({ children:[new Paragraph({ alignment:AlignmentType.LEFT, children:[new TextRun({text:'Concepto',bold:true,size:20,font:'Arial',color:'FFFFFF'})] })], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:7000,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
+          new TableCell({ children:[new Paragraph({ alignment:AlignmentType.CENTER, children:[new TextRun({text:colTitulo,bold:true,size:20,font:'Arial',color:'FFFFFF'})] })], shading:{fill:HS,type:ShadingType.CLEAR}, width:{size:2360,type:WidthType.DXA}, margins:{top:80,bottom:80,left:120,right:120}, borders:thinBorders }),
         ]}),
-        new TableRow({children:[td('Períodos Aportados a la alícuota vigente',7000,{size:20}), td(ap2,2360,{center:true})]}),
+        new TableRow({children:[td('Períodos Aportados a la alícuota vigente',7000), td(ap2,2360,{center:true})]}),
         new TableRow({children:[td('SAC Aportados',7000,{shading:AS}), td(sac,2360,{center:true,shading:AS})]}),
         new TableRow({children:[td('Períodos Descontados a la alícuota vigente',7000), td(desc5Val,2360,{center:true})]}),
-        new TableRow({children:[td('Períodos Adeudados',7000,{shading:AS}), td(adeudVal,2360,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Períodos Depositados',7000,{shading:AS}), td(depVal,2360,{center:true,shading:AS})]}),
+        new TableRow({children:[td('Períodos Adeudados',7000), td(adeudVal,2360,{center:true})]}),
         new TableRow({children:[td('Total Períodos Aportados',7000,{bold:true}), td(total,2360,{center:true,bold:true})]}),
       ]
     });
@@ -21138,7 +21156,8 @@ function buildDocHelpers(docxLib) {
 
   // Tabla B intervalos
   const colsB = [1300, 1200, 700, 700, 700, 700, 700, 700, 1360];
-  const tablaB = (tituloTotal, intervalos, rA, rM, rD) => {
+  const tablaB = (tituloTotal, intervalos, rA, rM, rD, tipoCargo) => {
+    const cargoLabel = tipoCargo || 'Administrativo';
     const filas = intervalos.map((iv, i) => {
       const [dy,dm,dd] = iv.desde.split('-');
       const [hy,hm,hd] = iv.hasta.split('-');
@@ -21170,7 +21189,7 @@ function buildDocHelpers(docxLib) {
     return new Table({
       width:{size:9360,type:WidthType.DXA}, columnWidths:colsB,
       rows:[
-        new TableRow({children:[th('Cargo',1300),th('Base\nDatos',1200),th('Desde',2100,3),th('Hasta',2100,3),th('Tiempo\nTrabajado',1360)]}),
+        new TableRow({children:[th(cargoLabel,1300),th('Base\nDatos',1200),th('Desde',2100,3),th('Hasta',2100,3),th('Tiempo\nTrabajado',1360)]}),
         new TableRow({children:[th('',1300),th('',1200),th('Día',700),th('Mes',700),th('Año',700),th('Día',700),th('Mes',700),th('Año',700),th('',1360)]}),
         ...filas, totalRow,
       ]
@@ -21237,8 +21256,11 @@ async function generarAdm() {
   const reafil = document.querySelector('input[name=adm-reafil]:checked')?.value||'sin';
   const certif = document.querySelector('input[name=adm-certif]:checked')?.value||'observada';
   const ap2 = g('adm-ap2')||'0'; const sac = g('adm-sac')||'0';
-  const desc5 = g('adm-desc5')||'0'; const adeud = g('adm-adeud')||'0';
+  const desc5 = g('adm-desc5')||'0'; const dep = g('adm-dep')||'0';
+  const adeud = g('adm-adeud')||'0';
   const totalA = document.getElementById('adm-total-a').textContent;
+  const obsA = g('adm-obs-a');
+  const tipoCargo = 'Administrativo';
   const frase = g('adm-frase-final')||'Los datos consignados son correctos y completos...';
   const res = window._admRes || { rB:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
 
@@ -21258,15 +21280,16 @@ async function generarAdm() {
     H.pM([{text:'Situación de Revista: ',bold:true,size:22},{text:revista+'.-',size:22}],{after:360}),
     H.p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-',{bold:true,size:22,before:120,after:160}),
     H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
-    H.tablaA1col(ap2,sac,desc5,adeud,totalA,'Cargo Administrativo'),
-    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+    H.tablaA1col(ap2,sac,desc5,dep,adeud,totalA,'Cargo '+tipoCargo),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:obsA?80:360}),
+    ...(obsA ? [H.p('('+obsA+')',{italic:true,size:18,after:360})] : []),
     H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
     H.p(certif==='observada'?'Certificación de servicio Observada, por No Coincidir con la base de datos de aportes.':'Los periodos de aportes registrados en la base de datos, coinciden con la Certificación de Servicios y Remuneraciones.',{size:20,before:60,after:200}),
     H.p('Certificación de Servicios (según Afiliado):',{bold:true,size:20,before:120,after:100}),
-    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0),
+    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0, tipoCargo),
     H.p('',{after:160}),
     H.p('Base de Datos (AGAP):',{bold:true,size:20,before:120,after:100}),
-    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0),
+    H.tablaB('de Aportes y Contribuciones Cargo '+tipoCargo, ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0, tipoCargo),
     H.p('',{after:160}),
     ...H.alertaWordChildren(certif, res.difDias||0, res.difAnios||0),
     ...H.pieFrase(frase, nInf),
@@ -21297,6 +21320,7 @@ async function generarMixto() {
   const certifAdm = document.querySelector('input[name=mix-certif-adm]:checked')?.value||'observada';
   const certifDoc = document.querySelector('input[name=mix-certif-doc]:checked')?.value||'observada';
   const frase = g('mix-frase-final');
+  const obsA = g('mix-obs-a');
 
   const gv = id => document.getElementById(id)?.value||'0';
   const totalAdm = document.getElementById('mix-total-adm').textContent;
@@ -21328,7 +21352,8 @@ async function generarMixto() {
     H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
     H.tablaA2col(gv('mix-adm-ap2'),gv('mix-adm-sac'),gv('mix-adm-desc')||'-.-',gv('mix-adm-dep')||'-.-',gv('mix-adm-adeud')||'-.-',totalAdm,
                  gv('mix-doc-ap2'),gv('mix-doc-sac'),gv('mix-doc-desc')||'-.-',gv('mix-doc-dep')||'-.-',gv('mix-doc-adeud')||'-.-',totalDoc),
-    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:obsA?80:360}),
+    ...(obsA ? [H.p('('+obsA+')',{italic:true,size:18,after:360})] : []),
 
     H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
     H.p(certifAdm==='observada'?'Certificación de servicio Administrativa Observada, por No Coincidir con la base de datos.':'Los periodos de aportes Administrativos coinciden con la Certificación.',{size:20,before:60,after:120}),
@@ -21381,8 +21406,11 @@ async function generarPension() {
   const reafil = document.querySelector('input[name=pen-reafil]:checked')?.value||'sin';
   const certif = document.querySelector('input[name=pen-certif]:checked')?.value||'observada';
   const ap2 = g('pen-ap2')||'0'; const sac = g('pen-sac')||'0';
-  const desc5 = g('pen-desc5')||'0'; const adeud = g('pen-adeud')||'0';
+  const desc5 = g('pen-desc5')||'0'; const dep = g('pen-dep')||'0';
+  const adeud = g('pen-adeud')||'0';
   const totalA = document.getElementById('pen-total-a').textContent;
+  const obsA = g('pen-obs-a');
+  const tipoCargo = 'Administrativo';
   const frase = g('pen-frase-final');
   const res = window._penRes || { rB:{a:0,m:0,d:0}, rC:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
 
@@ -21403,16 +21431,17 @@ async function generarPension() {
 
     H.p('A.  Aportes al Régimen de Asignación Complementaria Dcto 127/11.-',{bold:true,size:22,before:120,after:160}),
     H.p(reafil==='sin'?'Sin Re-afiliación a la caja complementaria Dcto 127/11.-':'Con Re-afiliación a la caja complementaria Dcto 127/11.-',{size:20,before:60,after:160}),
-    H.tablaA1col(ap2,sac,desc5,adeud,totalA,'Cargo Administrativo'),
-    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:360}),
+    H.tablaA1col(ap2,sac,desc5,dep,adeud,totalA,'Cargo '+tipoCargo),
+    H.p('*El Agente no posee deuda y registra los aportes correspondientes a la Caja Complementaria.',{italic:true,size:18,before:120,after:obsA?80:360}),
+    ...(obsA ? [H.p('('+obsA+')',{italic:true,size:18,after:360})] : []),
 
     H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
     H.p(certif==='observada'?'Certificación de servicio Observada, por No Coincidir con la base de datos de aportes.':'Los periodos de aportes registrados en la base de datos, coinciden con la Certificación de Servicios y Remuneraciones.',{size:20,before:60,after:200}),
     H.p('Certificación de Servicios (según Afiliado):',{bold:true,size:20,before:120,after:100}),
-    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0),
+    H.tablaB('Certificación de Servicios', ivCertTrab, res.rC?.a||0, res.rC?.m||0, res.rC?.d||0, tipoCargo),
     H.p('',{after:160}),
     H.p('Base de Datos (AGAP):',{bold:true,size:20,before:120,after:100}),
-    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0),
+    H.tablaB('de Aportes y Contribuciones Cargo '+tipoCargo, ivBddTrab, res.rB?.a||0, res.rB?.m||0, res.rB?.d||0, tipoCargo),
     H.p('',{after:160}),
     ...H.alertaWordChildren(certif, res.difDias||0, res.difAnios||0),
     ...H.pieFrase(frase, nInf),
