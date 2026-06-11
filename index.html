@@ -20338,7 +20338,7 @@ var __async = (__this, __arguments, generator) => {
         <tbody>
           <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-ap2" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="adm-sac" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
-          <tr><td>Períodos de "Deuda "Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Depositados</td><td style="text-align:center"><input type="number" id="adm-dep" value="0" min="0" step="0.5" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="adm-adeud" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="adm-total-a">0</span></td></tr>
@@ -20483,12 +20483,22 @@ var __async = (__this, __arguments, generator) => {
   <div class="card">
     <div class="card-header">B · Aportes Sistema de Seguridad Social – Cargo Administrativo</div>
     <div class="card-body">
-      <div class="field" style="margin-bottom:14px;">
-        <label>Estado de la Certificación</label>
-        <div class="radio-group">
-          <label><input type="radio" name="mix-certif-adm" value="observada" checked onchange="recalcularMixAdm()"> Observada</label>
-          <label><input type="radio" name="mix-certif-adm" value="ok" onchange="recalcularMixAdm()"> Conforme</label>
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Estado de la Certificación</label>
+          <div class="radio-group">
+            <label><input type="radio" name="mix-certif-adm" value="observada" checked onchange="recalcularMixAdm()"> Observada</label>
+            <label><input type="radio" name="mix-certif-adm" value="ok" onchange="recalcularMixAdm()"> Conforme</label>
+          </div>
         </div>
+        <div class="field">
+          <label>Tipo de Cargo (encabezado del cuadro)</label>
+          <select id="mix-tipo-cargo-adm" style="padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%;">
+            <option value="Administrativo">Administrativo</option>
+            <option value="Docente">Docente</option>
+          </select>
+        </div>
+      </div>
       </div>
       <div class="secb-grid">
         <div class="secb-bloque">
@@ -20528,12 +20538,22 @@ var __async = (__this, __arguments, generator) => {
   <div class="card">
     <div class="card-header">B · Aportes Sistema de Seguridad Social – Cargo Docente</div>
     <div class="card-body">
-      <div class="field" style="margin-bottom:14px;">
-        <label>Estado de la Certificación</label>
-        <div class="radio-group">
-          <label><input type="radio" name="mix-certif-doc" value="observada" checked onchange="recalcularMixDoc()"> Observada</label>
-          <label><input type="radio" name="mix-certif-doc" value="ok" onchange="recalcularMixDoc()"> Conforme</label>
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="field">
+          <label>Estado de la Certificación</label>
+          <div class="radio-group">
+            <label><input type="radio" name="mix-certif-doc" value="observada" checked onchange="recalcularMixDoc()"> Observada</label>
+            <label><input type="radio" name="mix-certif-doc" value="ok" onchange="recalcularMixDoc()"> Conforme</label>
+          </div>
         </div>
+        <div class="field">
+          <label>Tipo de Cargo (encabezado del cuadro)</label>
+          <select id="mix-tipo-cargo-doc" style="padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%;">
+            <option value="Administrativo">Administrativo</option>
+            <option value="Docente">Docente</option>
+          </select>
+        </div>
+      </div>
       </div>
       <div class="secb-grid">
         <div class="secb-bloque">
@@ -21339,6 +21359,8 @@ async function generarMixto() {
   const certifDoc = document.querySelector('input[name=mix-certif-doc]:checked')?.value||'observada';
   const frase = g('mix-frase-final');
   const obsA = g('mix-obs-a');
+  const tipoCargoAdm = document.getElementById('mix-tipo-cargo-adm')?.value || 'Administrativo';
+  const tipoCargoDoc = document.getElementById('mix-tipo-cargo-doc')?.value || 'Docente';
 
   const gv = id => document.getElementById(id)?.value||'0';
   const totalAdm = document.getElementById('mix-total-adm').textContent;
@@ -21376,19 +21398,19 @@ async function generarMixto() {
     H.p('B.  Aportes Sistema de Seguridad Social.',{bold:true,size:22,before:120,after:160}),
     H.p(certifAdm==='observada'?'Certificación de servicio Administrativa Observada, por No Coincidir con la base de datos.':'Los periodos de aportes Administrativos coinciden con la Certificación.',{size:20,before:60,after:120}),
     H.p('Certificación de Servicios Administrativo (Afiliado):',{bold:true,size:20,before:80,after:80}),
-    H.tablaB('Certificación Administrativo', ivAdmCert, resAdm.rC?.a||0, resAdm.rC?.m||0, resAdm.rC?.d||0),
+    H.tablaB('Certificación '+tipoCargoAdm, ivAdmCert, resAdm.rC?.a||0, resAdm.rC?.m||0, resAdm.rC?.d||0, tipoCargoAdm),
     H.p('',{after:100}),
     H.p('Base de Datos Administrativo (AGAP):',{bold:true,size:20,before:80,after:80}),
-    H.tablaB('de Aportes y Contribuciones Cargo Administrativo', ivAdmBdd, resAdm.rB?.a||0, resAdm.rB?.m||0, resAdm.rB?.d||0),
+    H.tablaB('de Aportes y Contribuciones Cargo '+tipoCargoAdm, ivAdmBdd, resAdm.rB?.a||0, resAdm.rB?.m||0, resAdm.rB?.d||0, tipoCargoAdm),
     H.p('',{after:100}),
     ...H.alertaWordChildren(certifAdm, resAdm.difDias||0, resAdm.difAnios||0),
 
     H.p(certifDoc==='observada'?'Certificación de servicio Docente Observada, por No Coincidir con la base de datos.':'Los periodos de aportes Docentes coinciden con la Certificación.',{size:20,before:160,after:120}),
     H.p('Certificación de Servicios Docente (Afiliado):',{bold:true,size:20,before:80,after:80}),
-    H.tablaB('Certificación Docente', ivDocCert, resDoc.rC?.a||0, resDoc.rC?.m||0, resDoc.rC?.d||0),
+    H.tablaB('Certificación '+tipoCargoDoc, ivDocCert, resDoc.rC?.a||0, resDoc.rC?.m||0, resDoc.rC?.d||0, tipoCargoDoc),
     H.p('',{after:100}),
     H.p('Base de Datos Docente (AGAP):',{bold:true,size:20,before:80,after:80}),
-    H.tablaB('de Aportes y Contribuciones Cargo DOCENTE', ivDocBdd, resDoc.rB?.a||0, resDoc.rB?.m||0, resDoc.rB?.d||0),
+    H.tablaB('de Aportes y Contribuciones Cargo '+tipoCargoDoc, ivDocBdd, resDoc.rB?.a||0, resDoc.rB?.m||0, resDoc.rB?.d||0, tipoCargoDoc),
     H.p('',{after:100}),
     ...H.alertaWordChildren(certifDoc, resDoc.difDias||0, resDoc.difAnios||0),
 
