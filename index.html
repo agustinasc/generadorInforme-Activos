@@ -20338,7 +20338,7 @@ var __async = (__this, __arguments, generator) => {
         <tbody>
           <tr><td>Períodos Aportados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-ap2" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>SAC Aportados</td><td style="text-align:center"><input type="number" id="adm-sac" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
-          <tr><td>Períodos Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
+          <tr><td>Períodos de "Deuda "Descontados a la alícuota vigente</td><td style="text-align:center"><input type="number" id="adm-desc5" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Depositados</td><td style="text-align:center"><input type="number" id="adm-dep" value="0" min="0" step="0.5" oninput="calcTotalAdm()"></td></tr>
           <tr><td>Períodos Adeudados</td><td style="text-align:center"><input type="number" id="adm-adeud" value="0" min="0" oninput="calcTotalAdm()"></td></tr>
           <tr class="total-row"><td>Total Períodos Aportados</td><td style="text-align:center"><span class="total-val" id="adm-total-a">0</span></td></tr>
@@ -20354,11 +20354,20 @@ var __async = (__this, __arguments, generator) => {
   <div class="card">
     <div class="card-header">B · Aportes Sistema de Seguridad Social</div>
     <div class="card-body">
-      <div class="field" style="margin-bottom:16px;">
-        <label>Estado de la Certificación de Servicio</label>
-        <div class="radio-group">
-          <label><input type="radio" name="adm-certif" value="observada" checked onchange="recalcularAdm()"> Observada (no coincide con base de datos)</label>
-          <label><input type="radio" name="adm-certif" value="ok" onchange="recalcularAdm()"> Conforme</label>
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Estado de la Certificación de Servicio</label>
+          <div class="radio-group">
+            <label><input type="radio" name="adm-certif" value="observada" checked onchange="recalcularAdm()"> Observada (no coincide con base de datos)</label>
+            <label><input type="radio" name="adm-certif" value="ok" onchange="recalcularAdm()"> Conforme</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tipo de Cargo (encabezado del cuadro)</label>
+          <select id="adm-tipo-cargo" style="padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%;">
+            <option value="Administrativo">Administrativo</option>
+            <option value="Docente">Docente</option>
+          </select>
         </div>
       </div>
       <div class="secb-grid">
@@ -20678,11 +20687,20 @@ var __async = (__this, __arguments, generator) => {
   <div class="card">
     <div class="card-header">B · Aportes Sistema de Seguridad Social</div>
     <div class="card-body">
-      <div class="field" style="margin-bottom:16px;">
-        <label>Estado de la Certificación de Servicio</label>
-        <div class="radio-group">
-          <label><input type="radio" name="pen-certif" value="observada" checked onchange="recalcularPen()"> Observada</label>
-          <label><input type="radio" name="pen-certif" value="ok" onchange="recalcularPen()"> Conforme</label>
+      <div class="form-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label>Estado de la Certificación de Servicio</label>
+          <div class="radio-group">
+            <label><input type="radio" name="pen-certif" value="observada" checked onchange="recalcularPen()"> Observada</label>
+            <label><input type="radio" name="pen-certif" value="ok" onchange="recalcularPen()"> Conforme</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Tipo de Cargo (encabezado del cuadro)</label>
+          <select id="pen-tipo-cargo" style="padding:7px 10px;border:1px solid #ccc;border-radius:5px;font-size:13px;width:100%;">
+            <option value="Administrativo">Administrativo</option>
+            <option value="Docente">Docente</option>
+          </select>
         </div>
       </div>
       <div class="secb-grid">
@@ -21260,7 +21278,7 @@ async function generarAdm() {
   const adeud = g('adm-adeud')||'0';
   const totalA = document.getElementById('adm-total-a').textContent;
   const obsA = g('adm-obs-a');
-  const tipoCargo = 'Administrativo';
+  const tipoCargo = document.getElementById('adm-tipo-cargo')?.value || 'Administrativo';
   const frase = g('adm-frase-final')||'Los datos consignados son correctos y completos...';
   const res = window._admRes || { rB:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
 
@@ -21410,7 +21428,7 @@ async function generarPension() {
   const adeud = g('pen-adeud')||'0';
   const totalA = document.getElementById('pen-total-a').textContent;
   const obsA = g('pen-obs-a');
-  const tipoCargo = 'Administrativo';
+  const tipoCargo = document.getElementById('pen-tipo-cargo')?.value || 'Administrativo';
   const frase = g('pen-frase-final');
   const res = window._penRes || { rB:{a:0,m:0,d:0}, rC:{a:0,m:0,d:0}, difDias:0, difAnios:0 };
 
